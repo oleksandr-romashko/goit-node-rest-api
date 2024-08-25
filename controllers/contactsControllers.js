@@ -1,11 +1,77 @@
-import contactsService from "../services/contactsServices.js";
+/**
+ * Controller to handle the request to get all contacts.
+ * It retrieves all contacts in an array from the request variable
+ * saved by the previous middleware
+ * and sends them in the response.
+ *
+ * @param {Object} req Express request object.
+ * @param {Object} res Express response object.
+ */
+const getAllContacts = async (req, res) => {
+  const allContacts = req.serviceMiddlewareArtifact;
+  res.json(allContacts);
+};
 
-export const getAllContacts = (req, res) => {};
+/**
+ * Controller to handle the request to get a single contact by ID.
+ * It retrieves contact from the request variable
+ * saved by the previous middleware
+ * and sends it in the response.
+ *
+ * @param {Object} req Express request object.
+ * @param {Object} res Express response object.
+ */
+const getOneContact = async (req, res) => {
+  const singleContact = req.serviceMiddlewareArtifact;
+  res.json(singleContact);
+};
 
-export const getOneContact = (req, res) => {};
+/**
+ * Controller to handle the request to delete a contact by ID.
+ * It retrieves deleted contact from the request variable
+ * saved by the previous middleware
+ * and sends it in the response.
+ *
+ * @param {Object} req Express request object.
+ * @param {Object} res Express response object.
+ */
+const deleteContact = async (req, res) => {
+  const deletedContact = req.serviceMiddlewareArtifact;
+  res.json(deletedContact);
+};
 
-export const deleteContact = (req, res) => {};
+/**
+ * Controller to handle the request to create a new contact.
+ * It retrieves created contact from the request variable
+ * saved by the previous middleware
+ * and sends it in the response.
+ *
+ * @param {Object} req Express request object.
+ * @param {Object} res Express response object.
+ */
+const createContact = async (req, res) => {
+  const createdContact = req.serviceMiddlewareArtifact;
+  res.status(201).json(createdContact);
+};
 
-export const createContact = (req, res) => {};
+/**
+ * Controller to handle the request to update an existing contact.
+ * It retrieves updated contact from the request variable
+ * saved by the previous middleware
+ * and sends it in the response.
+ *
+ * @param {Object} req Express request object.
+ * @param {Object} res Express response object.
+ */
+const updateContact = async (req, res) => {
+  const updatedContact = req.serviceMiddlewareArtifact;
+  res.json(updatedContact);
+};
 
-export const updateContact = (req, res) => {};
+export default {
+  getAllContacts,
+  getOneContact,
+  deleteContact,
+  createContact,
+  updateContact,
+};

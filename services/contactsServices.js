@@ -42,7 +42,7 @@ async function getContactById(contactId) {
  * @param {string} contactId Contact identifier.
  * @returns {object | null} The contact object that was removed, or null if the contact was not found.
  */
-async function removeContact(contactId) {
+async function removeContactById(contactId) {
   const contacts = await listContacts();
 
   const index = contacts.findIndex(el => el.id === contactId);
@@ -75,9 +75,34 @@ async function addContact({ name, email, phone }) {
   };
   contacts.push(contact);
 
-  if (await overwriteDbContacts(contacts)) {
-    return contact;
+  await overwriteDbContacts(contacts);
+
+  return contact;
+}
+
+/**
+ * Updates contact data. Partial update is allowed.
+ * @param {string} data.name Contact's name.
+ * @param {string} data.email Contacts e-mail address.
+ * @param {string} data.phone Contact's phone number.
+ * @returns {object | null} Update contact object.
+ */
+async function updateContact({ id, ...args }) {
+  const contacts = await listContacts();
+
+  const index = contacts.findIndex(el => el.id === id);
+  if (index === -1) {
+    return null;
   }
+  const updatedContact = {
+    ...contacts[index],
+    ...args,
+  };
+  contacts[index] = updatedContact;
+
+  await overwriteDbContacts(contacts);
+
+  return updatedContact;
 }
 
 /**
@@ -105,6 +130,7 @@ async function overwriteDbContacts(contacts) {
 export default {
   listContacts,
   getContactById,
-  removeContact,
+  removeContactById,
   addContact,
+  updateContact,
 };
