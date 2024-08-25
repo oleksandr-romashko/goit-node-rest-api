@@ -37,3 +37,10 @@ Store and manage your contacts using a REST API.
 To start the web-server use `npm start` (for production) or `npm run dev` (for development with daemon) command in your terminal.
 
 [Postman](https://www.postman.com/) application may be used to work and test REST API.
+
+### Additional application settings (.env file)
+
+See [.env.example](./.env.example) file for more details and use it as a reference for creating your own `.env` environment variables file:
+
+* You may set a specific port value on which the Express server will listen. 
+* You may turn on additional debugging info messages option. Please leave it commented for the use in any kind of production environment as it hides additional application implementation details.
