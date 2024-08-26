@@ -9,9 +9,9 @@ import HttpError from "../helpers/HttpError.js";
  * @property {string} ID_AND_BODY Represents an argument where both the ID and body are provided.
  */
 export const FUNC_ARGS = Object.freeze({
-  ID: "id arg",
-  BODY: "body arg",
-  ID_AND_BODY: "id and body arg",
+  ID: "id as an argument",
+  BODY: "body as an argument",
+  ID_AND_BODY: "id and body in common object as an argument",
 });
 
 /**
