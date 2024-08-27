@@ -68,10 +68,24 @@ const updateContact = (req, res) => {
   res.json(updatedContact);
 };
 
+/**
+ * Controller to handle the request to update the "favorite" status of an existing contact.
+ * It retrieves the updated contact status from the request variable
+ * saved by the previous middleware and sends it in the response.
+ *
+ * @param {Object} req Express request object.
+ * @param {Object} res Express response object.
+ */
+const updateContactStatus = (req, res) => {
+  const updatedStatusContact = req.serviceMiddlewareArtifact;
+  res.json(updatedStatusContact);
+};
+
 export default {
   getAllContacts,
   getOneContact,
   deleteContact,
   createContact,
   updateContact,
+  updateContactStatus,
 };

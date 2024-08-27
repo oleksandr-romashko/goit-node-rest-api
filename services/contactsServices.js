@@ -138,10 +138,16 @@ async function updateContact(id, data) {
   return updatedContact;
 }
 
+async function updateContactStatus(id, data) {
+  const updatedContact = await updateContact(id, data);
+  return updatedContact;
+}
+
 export default {
   listContacts,
   getContactById,
   removeContactById,
   addContact,
   updateContact,
+  updateContactStatus,
 };

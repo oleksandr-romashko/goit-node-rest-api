@@ -20,3 +20,7 @@ export const createContactServiceMiddleware = serviceWrapper(
 export const updateContactServiceMiddleware = serviceWrapper(
   contactsServices.updateContact
 );
+
+export const updateContactStatusServiceMiddleware = serviceWrapper(
+  contactsServices.updateContactStatus
+);

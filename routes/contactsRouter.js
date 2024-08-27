@@ -3,6 +3,7 @@ import express from "express";
 import {
   createContactReqBodyValidationMiddleware,
   updateContactReqBodyValidationMiddleware,
+  updateContactStatusReqBodyValidationMiddleware,
 } from "../middlewares/requestValidationMiddleware.js";
 import {
   getAllContactsServiceMiddleware,
@@ -10,6 +11,7 @@ import {
   removeContactServiceMiddleware,
   createContactServiceMiddleware,
   updateContactServiceMiddleware,
+  updateContactStatusServiceMiddleware,
 } from "../middlewares/serviceCallMiddleware.js";
 import { resultValidationMiddleware } from "../middlewares/resultValidationMiddleware.js";
 import contactsControllers from "../controllers/contactsControllers.js";
@@ -49,6 +51,14 @@ contactsRouter.put(
   updateContactServiceMiddleware,
   resultValidationMiddleware,
   contactsControllers.updateContact
+);
+
+contactsRouter.patch(
+  "/:id/favorite",
+  updateContactStatusReqBodyValidationMiddleware,
+  updateContactStatusServiceMiddleware,
+  resultValidationMiddleware,
+  contactsControllers.updateContactStatus
 );
 
 export default contactsRouter;

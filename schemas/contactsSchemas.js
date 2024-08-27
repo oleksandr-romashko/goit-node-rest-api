@@ -5,7 +5,7 @@ import Joi from "joi";
  * Order matters so keep current values as is, as code below refers to array index.
  * For extend and add new fields add them to the end of the array to refer to them by index.
  */
-const fields = ["name", "email", "phone"];
+const fields = ["name", "email", "phone", "favorite"];
 
 /**
  * Joi validation schema for creating a contact.
@@ -87,3 +87,19 @@ export const contactUpdateSchema = Joi.object({
       "', '"
     )}'`,
   });
+
+/**
+ * Joi validation schema for updating the "favorite" status of a contact.
+ * The schema ensures that only the "favorite" field is accepted in the request body.
+ */
+export const contactUpdateContactStatusSchema = Joi.object({
+  [fields[3]]: Joi.bool()
+    .required()
+    .messages({
+      "any.required": `'${fields[3]}' value is required`,
+    }),
+}).messages({
+  "object.unknown": `an unrecognized field {{#label}} was provided, valid fields are: '${fields.join(
+    "', '"
+  )}'`,
+});
