@@ -12,22 +12,25 @@ const messageList = {
 };
 
 /**
- * Creates an HTTP error wrapped around Error with a custom message
- * and optional details.
- *
- * @param {number} status The HTTP status code for the error (e.g., 404, 500).
- * @param {Object} [options={}] Optional parameters to customize the error.
- * @param {string} [options.message=messageList[status]] Custom error message. Defaults to a message based on the status code.
- * @param {string} [options.details] Additional details about the error.
- * @returns {Error} The error object with a custom message, status code, and optional details.
+ * Custom error class for handling HTTP errors in an Express application.
+ * Extends the native JavaScript `Error` class, adding an HTTP status code and optional details.
  */
-const HttpError = (status, { message = messageList[status], details } = {}) => {
-  const error = new Error(message);
-  error.status = status;
-  if (details) {
-    error.details = details;
+class HttpError extends Error {
+  /**
+   * Creates an instance of `HttpError`.
+   *
+   * @param {number} [status=500] The HTTP status code for the error. Defaults to 500 if not provided.
+   * @param {Object} [options={}] Optional parameters to customize the error.
+   * @param {string} [options.message] Custom error message. If not provided, a default message based on the status code is used.
+   * @param {string} [options.details] Additional details about the error.
+   */
+  constructor(status = 500, { message, details } = {}) {
+    super(message || messageList[status]);
+    this.status = status;
+    if (details) {
+      this.details = details;
+    }
   }
-  return error;
-};
+}
 
 export default HttpError;

@@ -1,4 +1,4 @@
-import serviceWrapper, { FUNC_ARGS } from "../decorators/serviceWrapper.js";
+import serviceWrapper from "../decorators/serviceWrapper.js";
 import contactsServices from "../services/contactsServices.js";
 
 export const getAllContactsServiceMiddleware = serviceWrapper(
@@ -6,21 +6,17 @@ export const getAllContactsServiceMiddleware = serviceWrapper(
 );
 
 export const getOneContactServiceMiddleware = serviceWrapper(
-  contactsServices.getContactById,
-  FUNC_ARGS.ID
+  contactsServices.getContactById
 );
 
 export const removeContactServiceMiddleware = serviceWrapper(
-  contactsServices.removeContactById,
-  FUNC_ARGS.ID
+  contactsServices.removeContactById
 );
 
 export const createContactServiceMiddleware = serviceWrapper(
-  contactsServices.addContact,
-  FUNC_ARGS.BODY
+  contactsServices.addContact
 );
 
 export const updateContactServiceMiddleware = serviceWrapper(
-  contactsServices.updateContact,
-  FUNC_ARGS.ID_AND_BODY
+  contactsServices.updateContact
 );

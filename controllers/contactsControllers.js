@@ -7,7 +7,7 @@
  * @param {Object} req Express request object.
  * @param {Object} res Express response object.
  */
-const getAllContacts = async (req, res) => {
+const getAllContacts = (req, res) => {
   const allContacts = req.serviceMiddlewareArtifact;
   res.json(allContacts);
 };
@@ -21,7 +21,7 @@ const getAllContacts = async (req, res) => {
  * @param {Object} req Express request object.
  * @param {Object} res Express response object.
  */
-const getOneContact = async (req, res) => {
+const getOneContact = (req, res) => {
   const singleContact = req.serviceMiddlewareArtifact;
   res.json(singleContact);
 };
@@ -35,7 +35,7 @@ const getOneContact = async (req, res) => {
  * @param {Object} req Express request object.
  * @param {Object} res Express response object.
  */
-const deleteContact = async (req, res) => {
+const deleteContact = (req, res) => {
   const deletedContact = req.serviceMiddlewareArtifact;
   res.json(deletedContact);
 };
@@ -49,7 +49,7 @@ const deleteContact = async (req, res) => {
  * @param {Object} req Express request object.
  * @param {Object} res Express response object.
  */
-const createContact = async (req, res) => {
+const createContact = (req, res) => {
   const createdContact = req.serviceMiddlewareArtifact;
   res.status(201).json(createdContact);
 };
@@ -63,7 +63,7 @@ const createContact = async (req, res) => {
  * @param {Object} req Express request object.
  * @param {Object} res Express response object.
  */
-const updateContact = async (req, res) => {
+const updateContact = (req, res) => {
   const updatedContact = req.serviceMiddlewareArtifact;
   res.json(updatedContact);
 };

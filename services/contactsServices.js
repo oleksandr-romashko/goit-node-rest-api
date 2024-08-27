@@ -1,130 +1,141 @@
-import fs from "node:fs/promises";
-import path from "node:path";
-import { nanoid } from "nanoid";
-
-const contactsPath = path.resolve("db", "contacts.json");
+import Contact from "../db/models/Contact.js";
+import HttpError from "../helpers/HttpError.js";
 
 /**
  * Gets all contacts.
+ *
  * @returns {object[]} List of contacts.
+ * @throws {Error} Throws an error if the operation fails, with details about
+ * the failure.
  */
 async function listContacts() {
-  let fileContent;
-  try {
-    fileContent = await fs.readFile(contactsPath, "utf-8");
-  } catch (error) {
-    throw new Error(`error: while reading contacts from ${contactsPath}`);
-  }
-
   let contacts;
   try {
-    contacts = JSON.parse(fileContent);
+    contacts = await Contact.findAll({
+      attributes: { exclude: ["updatedAt", "createdAt"] },
+      order: [["id", "asc"]],
+    });
   } catch (error) {
-    throw new Error(`error: while parsing contacts data from ${contactsPath}`);
+    error.message = `Error: while getting all contacts: ${error.message}`;
+    throw error;
   }
 
   return contacts;
 }
 
 /**
- * Gets single contact from the contacts list by its identifier.
- * @param {string} contactId Contact identifier.
+ * Retrieves a single contact from the contacts list by its identifier.
+ *
+ * @param {number} id Contact identifier.
  * @returns {object | null} Contact object if contact was found or null if not.
+ * @throws {Error} Throws an error if the operation fails, with details about
+ * the failure.
  */
-async function getContactById(contactId) {
-  const contactsList = await listContacts();
-  const contact = contactsList.find(el => el.id === contactId);
+async function getContactById(id) {
+  let contact;
+  try {
+    contact = await Contact.findOne({
+      attributes: { exclude: ["updatedAt", "createdAt"] },
+      where: {
+        id,
+      },
+    });
+  } catch (error) {
+    error.message = `Error: while getting single contact: ${error.message}`;
+    throw error;
+  }
+
   return contact || null;
 }
 
 /**
- * Removes contact from the contacts list by its identifier.
- * @param {string} contactId Contact identifier.
- * @returns {object | null} The contact object that was removed, or null if the contact was not found.
+ * Removes a contact from the contacts list by its identifier.
+ *
+ * @param {number} id The identifier of the contact to be removed.
+ * @returns {object | null} Removed contact object if the contact was found and
+ * deleted, or `null` if the contact was not found.
+ * @throws {HttpError} Throws an `HttpError` if the deletion was not effective
+ * or if an error occurs during the operation.
  */
-async function removeContactById(contactId) {
-  const contacts = await listContacts();
-
-  const index = contacts.findIndex(el => el.id === contactId);
-  if (index === -1) {
+async function removeContactById(id) {
+  const contact = await getContactById(id);
+  if (!contact) {
     return null;
   }
 
-  const [removedContact] = contacts.splice(index, 1);
-
-  if (await overwriteDbContacts(contacts)) {
-    return removedContact;
+  try {
+    const affectedRows = await Contact.destroy({ where: { id } });
+    if (affectedRows === 0) {
+      throw new HttpError(400, {
+        message: "Nothing to remove or deletion was not effective",
+        details: `number of affected rows is ${affectedRows}, contact not found or already deleted`,
+      });
+    }
+    return contact;
+  } catch (error) {
+    error.message = `Error: while removing contact: ${error.message}`;
+    throw error;
   }
 }
 
 /**
- * Adds contact to the contacts list.
- * @param {string} data.name Contact's name.
- * @param {string} data.email Contacts e-mail address.
- * @param {string} data.phone Contact's phone number.
+ * Adds a new contact to the contacts list.
+ *
+ * @param {object} data The data for the new contact.
+ * @param {string} data.name The name of the contact.
+ * @param {string} data.email The email address of the contact.
+ * @param {string} data.phone The phone number of the contact.
  * @returns {object | null} The newly added contact object.
+ * @throws {Error} Throws an error if the contact creation fails, with details
+ * about the failure.
  */
-async function addContact({ name, email, phone }) {
-  const contacts = await listContacts();
-
-  const contact = {
-    id: nanoid(),
-    name,
-    email,
-    phone,
-  };
-  contacts.push(contact);
-
-  await overwriteDbContacts(contacts);
-
-  return contact;
+async function addContact(_, { name, email, phone }) {
+  let createdContact;
+  try {
+    createdContact = await Contact.create({ name, email, phone });
+  } catch (error) {
+    error.message = `Error: while adding a new contact: ${error.message}`;
+    throw error;
+  }
+  return createdContact;
 }
 
 /**
- * Updates contact data. Partial update is allowed.
- * @param {string} data.name Contact's name.
- * @param {string} data.email Contacts e-mail address.
- * @param {string} data.phone Contact's phone number.
- * @returns {object | null} Update contact object.
+ * Updates contact data. Partial updates are allowed.
+ *
+ * @param {number} id Contact identifier.
+ * @param {object} data Contact data to update.
+ * @param {string} [data.name] Contact's name.
+ * @param {string} [data.email] Contact's e-mail address.
+ * @param {string} [data.phone] Contact's phone number.
+ * @returns {object | null} The updated contact object, or null if the contact
+ * does not exist.
+ * @throws {HttpError} Throws an error if the update operation fails or is not
+ * effective.
  */
-async function updateContact({ id, ...args }) {
-  const contacts = await listContacts();
+async function updateContact(id, data) {
+  let affectedRows;
+  try {
+    [affectedRows] = await Contact.update(data, { where: { id } });
+  } catch (error) {
+    error.message = `Error: while updating contact: ${error.message}`;
+    throw error;
+  }
 
-  const index = contacts.findIndex(el => el.id === id);
-  if (index === -1) {
+  const updatedContact = await getContactById(id);
+
+  if (!affectedRows && updatedContact) {
+    throw new HttpError(400, {
+      message: "Nothing to update or update was not effective",
+      details: `number of affected rows is ${affectedRows}`,
+    });
+  }
+
+  if (!updatedContact) {
     return null;
   }
-  const updatedContact = {
-    ...contacts[index],
-    ...args,
-  };
-  contacts[index] = updatedContact;
-
-  await overwriteDbContacts(contacts);
 
   return updatedContact;
-}
-
-/**
- * Overwrites existing contacts list.
- * @param {object[]} contacts New contacts list to replace the existing one
- * @returns {boolean} Successful status of contacts overwriting operation.
- */
-async function overwriteDbContacts(contacts) {
-  let jsonContacts;
-  try {
-    jsonContacts = JSON.stringify(contacts, null, 2);
-  } catch (error) {
-    throw new Error("error: while converting contacts into JSON");
-  }
-
-  try {
-    await fs.writeFile(contactsPath, jsonContacts, "utf8");
-  } catch (error) {
-    throw new Error(`error: while writing contacts to ${error.path}`);
-  }
-
-  return true;
 }
 
 export default {

@@ -1,17 +1,17 @@
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 
+import sequelize from "./db/sequelize.js";
 import contactsRouter from "./routes/contactsRouter.js";
 import HttpError from "./helpers/HttpError.js";
 
 /**
  * Port on which the Express server will listen.
  */
-const PORT = process.env.PORT || 3000;
+const WEB_SERVER_PORT = Number(process.env.PORT) || 3000;
 /**
  * Flag indicating whether debugging is enabled.
  * Prints additional detailed messages on errors.
@@ -52,7 +52,7 @@ app.use("/api/contacts", contactsRouter);
  */
 app.use((req, _, next) => {
   const fullUrl = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
-  next(HttpError(404, { details: `Route '${fullUrl}' not found` }));
+  next(new HttpError(404, { details: `Route '${fullUrl}' not found` }));
 });
 
 /**
@@ -73,9 +73,20 @@ app.use((err, _, res, __) => {
 });
 
 /**
- * Starts the Express server on the specified port.
+ * Connects to database and if successful starts the Express server on the specified port.
+ * Logs a message indicating database connection status.
  * Logs a message indicating that the server is running.
  */
-app.listen(PORT, () => {
-  console.log(`Server is running. Use our API on port: ${PORT}`);
-});
+try {
+  console.log(
+    "Application started. Establishing connection to the database..."
+  );
+  await sequelize.authenticate();
+  console.log("Database connection successful");
+  app.listen(WEB_SERVER_PORT, () => {
+    console.log(`Server is running. Use our API on port: ${WEB_SERVER_PORT}`);
+  });
+} catch (error) {
+  console.log("Unable to connect to the database:", error.message);
+  process.exit(1);
+}

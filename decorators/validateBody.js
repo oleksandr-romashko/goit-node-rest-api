@@ -17,7 +17,7 @@ const validateBody = schema => {
       abortEarly: false,
     });
     if (error) {
-      return next(HttpError(400, { message: error.message }));
+      return next(new HttpError(400, { message: error.message }));
     }
     next();
   };

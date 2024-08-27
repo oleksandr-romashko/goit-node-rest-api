@@ -15,7 +15,7 @@ const validateResult = () => {
 
     if (!result) {
       return next(
-        HttpError(404, {
+        new HttpError(404, {
           message: "Not found",
           details: `Contact with id '${req.params.id}' not found`,
         })
