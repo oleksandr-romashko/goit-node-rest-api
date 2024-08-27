@@ -17,7 +17,7 @@ const serviceWrapper = serviceFunc => {
     try {
       const result = await serviceFunc(req.params.id, { ...req.body });
       req.serviceMiddlewareArtifact = result;
-      next();
+      return next();
     } catch (err) {
       if (err instanceof ValidationError) {
         return next(
