@@ -1,6 +1,13 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../sequelize.js";
 
+/**
+ * Sequelize model definition for the "contact" table.
+ *
+ * Use the following code to update the database table:
+ *   - `Contact.sync({ force: true });` to drop and recreate the table.
+ *   - `Contact.sync({ alter: true });` to update the table structure without dropping it.
+ */
 const Contact = sequelize.define(
   "contact",
   {
@@ -52,9 +59,5 @@ const Contact = sequelize.define(
     },
   }
 );
-
-// Contact.sync();
-// Contact.sync({ force: true });
-// Contact.sync({ alter: true });
 
 export default Contact;
