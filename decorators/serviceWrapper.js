@@ -14,10 +14,9 @@ import HttpError from "../helpers/HttpError.js";
  */
 const serviceWrapper = serviceFunc => {
   return async (req, _, next) => {
+    let result;
     try {
-      const result = await serviceFunc(req.params.id, { ...req.body });
-      req.serviceMiddlewareArtifact = result;
-      return next();
+      result = await serviceFunc(req.params.id, { ...req.body });
     } catch (err) {
       if (err instanceof ValidationError) {
         return next(
@@ -33,6 +32,8 @@ const serviceWrapper = serviceFunc => {
       }
       return next(new HttpError(500, { details: `error: ${err.message}` }));
     }
+    req.serviceMiddlewareArtifact = result;
+    next();
   };
 };
 
