@@ -1,6 +1,12 @@
 import validateBody from "../decorators/validateBody.js";
-import { authRegisterUserSchema } from "../schemas/authSchemas.js";
+import {
+  authRegisterUserSchema,
+  authLoginUserSchema,
+} from "../schemas/authSchemas.js";
 
-export const registerUserReqBodyValidationMiddleware = validateBody(
+export const authRegisterUserReqBodyValidationMiddleware = validateBody(
   authRegisterUserSchema
 );
+
+export const authLoginUserReqBodyValidationMiddleware =
+  validateBody(authLoginUserSchema);

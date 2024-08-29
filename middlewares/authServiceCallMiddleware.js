@@ -4,3 +4,7 @@ import authServices from "../services/authServices.js";
 export const registerUserServiceMiddleware = serviceWrapper(
   authServices.registerUser
 );
+
+export const loginUserServiceMiddleware = serviceWrapper(
+  authServices.loginUser
+);

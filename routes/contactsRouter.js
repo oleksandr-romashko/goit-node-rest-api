@@ -13,7 +13,7 @@ import {
   updateContactServiceMiddleware,
   updateContactStatusServiceMiddleware,
 } from "../middlewares/contactsServiceCallMiddleware.js";
-import { contactsReplyValidationMiddleware } from "../middlewares/contactsReplyValidationMiddleware.js";
+import { replyValidationMiddleware } from "../middlewares/replyValidationMiddleware.js";
 import contactsControllers from "../controllers/contactsControllers.js";
 
 const contactsRouter = express.Router();
@@ -27,14 +27,14 @@ contactsRouter.get(
 contactsRouter.get(
   "/:id",
   getOneContactServiceMiddleware,
-  contactsReplyValidationMiddleware,
+  replyValidationMiddleware("Contact"),
   contactsControllers.getOneContact
 );
 
 contactsRouter.delete(
   "/:id",
   removeContactServiceMiddleware,
-  contactsReplyValidationMiddleware,
+  replyValidationMiddleware("Contact"),
   contactsControllers.deleteContact
 );
 
@@ -49,7 +49,7 @@ contactsRouter.put(
   "/:id",
   updateContactReqBodyValidationMiddleware,
   updateContactServiceMiddleware,
-  contactsReplyValidationMiddleware,
+  replyValidationMiddleware("Contact"),
   contactsControllers.updateContact
 );
 
@@ -57,7 +57,7 @@ contactsRouter.patch(
   "/:id/favorite",
   updateContactStatusReqBodyValidationMiddleware,
   updateContactStatusServiceMiddleware,
-  contactsReplyValidationMiddleware,
+  replyValidationMiddleware("Contact"),
   contactsControllers.updateContactStatus
 );
 

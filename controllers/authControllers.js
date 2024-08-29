@@ -8,11 +8,6 @@
  *
  * @param {Object} req Express request object.
  * @param {Object} res Express response object.
- * @property {Object} req.serviceMiddlewareArtifact The object containing the user details.
- * @property {string} req.serviceMiddlewareArtifact.email The email address of the newly registered user.
- * @property {string} req.serviceMiddlewareArtifact.subscription The subscription type of the newly registered user.
- *
- * @returns {void} Sends a JSON response with the registered user's details.
  */
 const registerUser = (req, res) => {
   const { email, subscription } = req.serviceMiddlewareArtifact;
@@ -24,6 +19,22 @@ const registerUser = (req, res) => {
   });
 };
 
+/**
+ * Controller to handle the request to log in a user.
+ * It retrieves the user's details from the request variable
+ * saved by the previous middleware and sends them in the response.
+ *
+ * The response includes the user details.
+ *
+ * @param {Object} req Express request object.
+ * @param {Object} res Express response object.
+ */
+const loginUser = (req, res) => {
+  const contact = req.serviceMiddlewareArtifact;
+  res.json(contact);
+};
+
 export default {
   registerUser,
+  loginUser,
 };

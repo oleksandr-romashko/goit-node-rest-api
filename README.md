@@ -43,5 +43,7 @@ To start the web-server use `npm start` (for production) or `npm run dev` (for d
 
 See [.env.example](./.env.example) file for more details and use it as a reference for creating your own `.env` environment variables file:
 
+* You should set database connection settings.
+* You should set your own JWT Secret Key to sign and verify JWTs.
 * You may set a specific port value on which the Express server will listen. 
 * You may turn on additional debugging info messages option. Please leave it commented for the use in any kind of production environment as it hides additional application implementation details.

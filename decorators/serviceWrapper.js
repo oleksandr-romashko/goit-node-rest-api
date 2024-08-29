@@ -43,6 +43,7 @@ const serviceWrapper = serviceFunc => {
       if (err instanceof HttpError) {
         return next(err);
       }
+      // other error types
       return next(new HttpError(500, { details: `error: ${err.message}` }));
     }
     req.serviceMiddlewareArtifact = result;
