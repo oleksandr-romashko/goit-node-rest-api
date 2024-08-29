@@ -6,6 +6,7 @@ import cors from "cors";
 
 import sequelize from "./db/sequelize.js";
 import contactsRouter from "./routes/contactsRouter.js";
+import authRouter from "./routes/authRouter.js";
 import HttpError from "./helpers/HttpError.js";
 
 /**
@@ -37,6 +38,12 @@ app.use(cors());
  * Allows the app to process JSON payloads in incoming requests.
  */
 app.use(express.json());
+
+/**
+ * Route handler for all authentication-related routes.
+ * @namespace authRouter
+ */
+app.use("/api/auth", authRouter);
 
 /**
  * Route handler for all contact-related routes.

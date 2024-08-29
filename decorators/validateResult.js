@@ -9,7 +9,7 @@ import HttpError from "../helpers/HttpError.js";
  *
  * @returns {Function} Middleware function for Express.js.
  */
-const validateResult = () => {
+const validateResult = (resourceName = "Resource") => {
   return (req, _, next) => {
     const result = req.serviceMiddlewareArtifact;
 
@@ -17,7 +17,7 @@ const validateResult = () => {
       return next(
         new HttpError(404, {
           message: "Not found",
-          details: `Contact with id '${req.params.id}' not found`,
+          details: `${resourceName} with id '${req.params.id}' not found`,
         })
       );
     }

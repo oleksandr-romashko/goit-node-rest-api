@@ -1,5 +1,7 @@
 import { DataTypes } from "sequelize";
+
 import sequelize from "../sequelize.js";
+import { emailRegEx, emailMinLength } from "../../constants/authConstants.js";
 
 /**
  * Sequelize model definition for the "contact" table.
@@ -16,15 +18,18 @@ const Contact = sequelize.define(
       allowNull: false,
       validate: {
         notEmpty: true,
-        len: [3, 100],
+        len: [1, 100],
       },
     },
     email: {
       type: DataTypes.STRING(254),
       allowNull: false,
       validate: {
-        isEmail: true,
-        len: [5, 254],
+        notEmpty: true,
+        is: {
+          args: emailRegEx,
+        },
+        len: [emailMinLength, 254],
       },
     },
     phone: {

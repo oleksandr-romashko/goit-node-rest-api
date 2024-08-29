@@ -1,4 +1,4 @@
-import { ValidationError } from "sequelize";
+import { UniqueConstraintError, ValidationError } from "sequelize";
 import HttpError from "../helpers/HttpError.js";
 
 /**
@@ -18,15 +18,28 @@ const serviceWrapper = serviceFunc => {
     try {
       result = await serviceFunc(req.params.id, { ...req.body });
     } catch (err) {
+      // unique value error on database side
+      if (err instanceof UniqueConstraintError) {
+        const [{ path }] = err.errors;
+        const itemName = path.charAt(0).toUpperCase() + path.slice(1);
+        return next(
+          new HttpError(409, {
+            message: `${itemName} in use`,
+            details: `${err.message}: The '${path}' field has a unique constraint and the provided value already exists in the database`,
+          })
+        );
+      }
+      // validation error on database side
       if (err instanceof ValidationError) {
         return next(
           new HttpError(400, {
             message: err.message,
             details:
-              "error provided by database service function call while processing database request",
+              "Error occurred during the service function call to process the database request",
           })
         );
       }
+      // thrown custom http error
       if (err instanceof HttpError) {
         return next(err);
       }

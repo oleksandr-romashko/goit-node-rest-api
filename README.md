@@ -25,6 +25,7 @@ Store and manage your contacts using a REST API.
   * `DELETE /api/contacts/` - Deletes the contact by `id`. Returns the object of the found and deleted contact in JSON format. If the contact by id is not found, returns a JSON response in the format `{"message": "Not found"}` with a `404` status.
   * `POST /api/contacts` - Returns the newly created contact object with fields `{id, name, email, phone}`.
   * `PUT /api/contacts/` - Returns the updated contact object. If the contact by `id` is not found, returns a JSON response in the format `{"message": "Not found"}` with a `404` status.
+  * `POST /auth/register` register user
 
 ## Quickstart
 

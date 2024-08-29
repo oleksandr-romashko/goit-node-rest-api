@@ -1,5 +1,7 @@
 import Joi from "joi";
 
+import { emailRegEx, emailMinLength } from "../constants/authConstants.js";
+
 /**
  * An array of contact object fields.
  * Order matters so keep current values as is, as code below refers to array index.
@@ -30,12 +32,14 @@ export const contactCreateSchema = Joi.object({
       "string.empty": `'${fields[0]}' value cannot be empty`,
     }),
   [fields[1]]: Joi.string()
-    .email()
     .required()
+    .pattern(emailRegEx)
+    .min(emailMinLength)
     .messages({
       "any.required": `'${fields[1]}' value is required`,
       "string.empty": `'${fields[1]}' value cannot be empty`,
-      "string.email": `'${fields[1]}' value should be a valid e-mail address`,
+      "string.pattern.base": `'${fields[1]}' value should be a valid e-mail address`,
+      "string.min": `'${fields[1]}' value should be at least ${emailMinLength} characters long`,
     }),
   [fields[2]]: Joi.string()
     .required()
@@ -70,10 +74,12 @@ export const contactUpdateSchema = Joi.object({
     "string.empty": `'${fields[0]}' value cannot be empty`,
   }),
   [fields[1]]: Joi.string()
-    .email()
+    .pattern(emailRegEx)
+    .min(emailMinLength)
     .messages({
       "string.empty": `'${fields[1]}' value cannot be empty`,
-      "string.email": `'${fields[1]}' value should be a valid e-mail address`,
+      "string.pattern.base": `'${fields[1]}' value should be a valid e-mail address`,
+      "string.min": `'${fields[1]}' value should be at least ${emailMinLength} characters long`,
     }),
   [fields[2]]: Joi.string().messages({
     "string.empty": `'${fields[2]}' value cannot be empty`,

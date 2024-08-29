@@ -4,7 +4,7 @@ import {
   createContactReqBodyValidationMiddleware,
   updateContactReqBodyValidationMiddleware,
   updateContactStatusReqBodyValidationMiddleware,
-} from "../middlewares/requestValidationMiddleware.js";
+} from "../middlewares/contactsRequestValidationMiddleware.js";
 import {
   getAllContactsServiceMiddleware,
   getOneContactServiceMiddleware,
@@ -12,8 +12,8 @@ import {
   createContactServiceMiddleware,
   updateContactServiceMiddleware,
   updateContactStatusServiceMiddleware,
-} from "../middlewares/serviceCallMiddleware.js";
-import { resultValidationMiddleware } from "../middlewares/resultValidationMiddleware.js";
+} from "../middlewares/contactsServiceCallMiddleware.js";
+import { contactsReplyValidationMiddleware } from "../middlewares/contactsReplyValidationMiddleware.js";
 import contactsControllers from "../controllers/contactsControllers.js";
 
 const contactsRouter = express.Router();
@@ -27,14 +27,14 @@ contactsRouter.get(
 contactsRouter.get(
   "/:id",
   getOneContactServiceMiddleware,
-  resultValidationMiddleware,
+  contactsReplyValidationMiddleware,
   contactsControllers.getOneContact
 );
 
 contactsRouter.delete(
   "/:id",
   removeContactServiceMiddleware,
-  resultValidationMiddleware,
+  contactsReplyValidationMiddleware,
   contactsControllers.deleteContact
 );
 
@@ -49,7 +49,7 @@ contactsRouter.put(
   "/:id",
   updateContactReqBodyValidationMiddleware,
   updateContactServiceMiddleware,
-  resultValidationMiddleware,
+  contactsReplyValidationMiddleware,
   contactsControllers.updateContact
 );
 
@@ -57,7 +57,7 @@ contactsRouter.patch(
   "/:id/favorite",
   updateContactStatusReqBodyValidationMiddleware,
   updateContactStatusServiceMiddleware,
-  resultValidationMiddleware,
+  contactsReplyValidationMiddleware,
   contactsControllers.updateContactStatus
 );
 
