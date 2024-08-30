@@ -1,6 +1,6 @@
 import express from "express";
 
-import authenticate from "../middlewares/authenticate.js";
+import authenticate from "../middlewares/authenticateMiddleware.js";
 import {
   createContactReqBodyValidationMiddleware,
   updateContactReqBodyValidationMiddleware,
