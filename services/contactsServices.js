@@ -1,20 +1,34 @@
+import { paginationLimitDefault } from "../constants/contactsConstants.js";
 import Contact from "../db/models/Contact.js";
 import HttpError from "../helpers/HttpError.js";
 
 /**
- * Gets all contacts.
+ * Retrieves a paginated list of contacts for a specific owner.
  *
- * @returns {object[]} List of contacts.
- * @throws {Error} Throws an error if the operation fails, with details about
- * the failure.
+ * @param {number} _ Unused parameter.
+ * @param {object} data Object containing the `owner` ID.
+ * @param {number} data.owner The ID of the owner to filter contacts.
+ * @param {object} queryParams Query parameters for pagination.
+ * @param {number} [queryParams.page=1] The page number for pagination (default is 1).
+ * @param {number} [queryParams.limit=paginationLimitDefault] The number of contacts per page (default is `paginationLimitDefault`).
+ * @returns {object[]} A list of contacts for the specified owner, with pagination applied.
+ * @throws {Error} Throws an error if the operation fails, with details about the failure.
  */
-async function listContacts(_, { owner }) {
+async function listContacts(
+  _,
+  { owner },
+  { page = 1, limit = paginationLimitDefault }
+) {
+  const normalizedLimit = Number(limit);
+  const offset = (Number(page) - 1) * normalizedLimit;
   let contacts;
   try {
     contacts = await Contact.findAll({
       where: {
         owner,
       },
+      offset,
+      limit: normalizedLimit,
       order: [["id", "asc"]],
     });
   } catch (error) {
@@ -143,6 +157,14 @@ async function updateContact(id, { owner, ...restData }) {
   return updatedContact;
 }
 
+/**
+ * Updates the status of a contact .
+ *
+ * @param {number} id The identifier of the contact to be updated.
+ * @param {object} data The contact data to update, excluding `owner`.
+ * @returns {object | null} The updated contact object, or `null` if the contact does not exist.
+ * @throws {HttpError} Throws an `HttpError` if the update operation fails or is not effective.
+ */
 async function updateContactStatus(id, { owner, ...restData }) {
   const updatedContact = await updateContact(id, restData);
   return updatedContact;

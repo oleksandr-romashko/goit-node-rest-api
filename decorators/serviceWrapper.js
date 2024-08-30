@@ -3,33 +3,23 @@ import HttpError from "../helpers/HttpError.js";
 
 /**
  * Middleware decorator for wrapping service functions.
- * Returns a middleware function that calls a service function with `id` and `body` parameters
- * derived from the request.
- * Handles errors by passing them to the next middleware.
- * Stores the result of the service function in `req.serviceMiddlewareArtifact`.
- *
- * @param {Function} serviceFunc The service function to be wrapped.
- * @returns {Function} Middleware function for Express.js.
- * @throws {HttpError} Throws an `HttpError` if a validation error or other error occurs.
- */
-
-/**
- * Middleware decorator for wrapping service functions.
- * Returns a middleware function that calls a service function with `id` and `body` parameters
+ * Returns a middleware function that calls a service function with `id`, `body`, and `query` parameters
  * derived from the request.
  *
- * If the `req.user` object is present, the `owner` field is set in the `body` with the ID from `req.user`.
+ * If the `req.user` object is present, the `owner` field is added to the `body` with the ID from `req.user`.
  * This allows the service function to receive the user ID for operations requiring ownership context.
  *
  * The middleware handles errors by passing them to the next middleware
  * and stores the result of the service function in `req.serviceMiddlewareArtifact`.
  *
- * @param {Function} serviceFunc The service function to be wrapped. It should accept two parameters:
+ * @param {Function} serviceFunc The service function to be wrapped. It should accept three parameters:
  *   - `id` (number): The ID parameter from the request.
  *   - `body` (object): The request body, which may include an `owner` field if `req.user` is present.
+ *   - `query` (object): The query parameters from the request, which may include pagination options like `page` and `limit`.
  * @returns {Function} Middleware function for Express.js. This middleware:
  *   - Extracts the `id` from `req.params`.
- *   - Adds the `owner` field to the body with `req.user.id` if `req.user` is available.
+ *   - Adds the `owner` field to the `body` with `req.user.id` if `req.user` is available.
+ *   - Extracts pagination options from `req.query` and passes them as `query`.
  *   - Passes the result of the service function to `req.serviceMiddlewareArtifact`.
  * @throws {HttpError} Throws an `HttpError` if a validation error or other error occurs.
  *   - **400 Bad Request**: When a validation error occurs on the database side.
@@ -40,11 +30,16 @@ const serviceWrapper = serviceFunc => {
   return async (req, _, next) => {
     let result;
     try {
+      const id = req.params.id;
       const body = { ...req.body };
       if (req.user) {
         body.owner = req.user.id;
       }
-      result = await serviceFunc(req.params.id, body);
+      const query = {
+        page: req.query.page,
+        limit: req.query.limit,
+      };
+      result = await serviceFunc(id, body, query);
     } catch (err) {
       // unique value constraint error on database side
       if (err instanceof UniqueConstraintError) {
