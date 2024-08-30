@@ -13,7 +13,8 @@ const { JWT_SECRET_KEY } = process.env;
  * 2. Ensures the token type is 'Bearer'.
  * 3. Verifies the token and extracts the user ID from the payload.
  * 4. Checks if the user associated with the token exists in the database
- * 5. Assign user object to `req.user`.
+ * 5. Check if the user in the database has a token and compare it with the token in the request
+ * 6. Assign user object to `req.user`.
  *
  * If any of these checks fail, an HTTP error with status 401 (Unauthorized)
  * is passed to the next middleware.
@@ -73,7 +74,26 @@ const authenticate = async (req, _, next) => {
     return next(
       new HttpError(401, {
         message: "Not authorized",
-        details: `User with ID ${id} specified in the JWT token was not found in the database.`,
+        details: `User with ID '${id}' specified in the JWT token was not found in the database.`,
+      })
+    );
+  }
+
+  // 5. Check if the user in the database has a token and compare it with the token in the request
+  if (!user.token) {
+    return next(
+      new HttpError(401, {
+        message: "Not authorized",
+        details: `User with ID '${id}' has no token and is logged out.`,
+      })
+    );
+  }
+
+  if (user.token !== token) {
+    return next(
+      new HttpError(401, {
+        message: "Not authorized",
+        details: `User with ID '${id}' has a different token and does not have a valid token.`,
       })
     );
   }
