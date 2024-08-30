@@ -1,3 +1,5 @@
+import authServices from "../services/authServices.js";
+
 /**
  * Controller to handle the request to register a new user.
  * It retrieves the newly registered user's details from the request variable
@@ -35,6 +37,19 @@ const loginUser = (req, res) => {
 };
 
 /**
+ * Controller to handle the request to log out a user.
+ * This function sends a 204 No Content response, indicating
+ * that the request was successful but there is no content to send in the response.
+ *
+ * @param {Object} res Express response object.
+ */
+const logoutUser = async (req, res) => {
+  const { id } = req.user;
+  await authServices.updateUser(id, { token: null });
+  res.status(204).end();
+};
+
+/**
  * Controller to handle the request to get the current user's details.
  * It retrieves the user's details from the request variable
  * (populated by an authentication middleware) and sends them in the response.
@@ -57,5 +72,6 @@ const getCurrent = (req, res) => {
 export default {
   registerUser,
   loginUser,
+  logoutUser,
   getCurrent,
 };
