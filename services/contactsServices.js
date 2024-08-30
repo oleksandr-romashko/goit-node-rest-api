@@ -12,7 +12,6 @@ async function listContacts(_, { owner }) {
   let contacts;
   try {
     contacts = await Contact.findAll({
-      attributes: { exclude: ["owner", "updatedAt", "createdAt"] },
       where: {
         owner,
       },
@@ -38,7 +37,6 @@ async function getContact(id, { owner }) {
   let contact;
   try {
     contact = await Contact.findOne({
-      attributes: { exclude: ["owner", "updatedAt", "createdAt"] },
       where: {
         id,
         owner,

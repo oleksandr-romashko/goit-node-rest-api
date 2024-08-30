@@ -79,11 +79,31 @@ const Contact = sequelize.define(
   },
   {
     hooks: {
+      afterFind: result => {
+        if (Array.isArray(result)) {
+          result.forEach(record => {
+            delete record.dataValues.owner;
+            delete record.dataValues.updatedAt;
+            delete record.dataValues.createdAt;
+          });
+        } else if (result) {
+          delete result.dataValues.owner;
+          delete result.dataValues.updatedAt;
+          delete result.dataValues.createdAt;
+        }
+      },
       afterCreate: record => {
+        delete record.dataValues.owner;
         delete record.dataValues.updatedAt;
         delete record.dataValues.createdAt;
       },
       afterUpdate: record => {
+        delete record.dataValues.owner;
+        delete record.dataValues.updatedAt;
+        delete record.dataValues.createdAt;
+      },
+      afterDestroy: record => {
+        delete record.dataValues.owner;
         delete record.dataValues.updatedAt;
         delete record.dataValues.createdAt;
       },
