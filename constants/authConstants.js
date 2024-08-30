@@ -19,3 +19,19 @@ export const emailChecks = [
     tip: `should have a minimum length of ${emailMinLength} characters`,
   },
 ];
+
+/**
+ * The expiration time for JWT tokens.
+ * This determines how long the token will remain valid.
+ *
+ * The format is a string that represents the duration.
+ *
+ * Common values include:
+ * - "30m": 30 minutes
+ * - "1h": 1 hour
+ * - "23h": 23 hours
+ * - "1d": 1 day
+ * - "7d": 7 days
+ * - "2M": 2 months (approximately 60 days)
+ */
+export const jwtTokenExpirationTime = "23h";

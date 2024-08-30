@@ -41,7 +41,7 @@ async function getContactById(id) {
       },
     });
   } catch (error) {
-    error.message = `Error: while getting single contact: ${error.message}`;
+    error.message = `Failed to retrieve contact with ID ${id}: ${error.message}`;
     throw error;
   }
 

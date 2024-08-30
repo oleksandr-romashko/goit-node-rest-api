@@ -1,7 +1,8 @@
-import bcrypt from "bcryptjs";
 import "dotenv/config";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+import { jwtTokenExpirationTime } from "../constants/authConstants.js";
 import User from "../db/models/User.js";
 import HttpError from "../helpers/HttpError.js";
 
@@ -48,7 +49,10 @@ async function registerUser(_, data) {
 async function loginUser(_, { email, password }) {
   let user;
   try {
-    user = await User.findOne({ where: { email } });
+    user = await User.findOne({
+      attributes: { exclude: ["updatedAt", "createdAt"] },
+      where: { email },
+    });
   } catch (error) {
     error.message = `Error: while login user and finding existing user: ${error.message}`;
     throw error;
@@ -80,7 +84,9 @@ async function loginUser(_, { email, password }) {
     const payload = {
       id: user.id,
     };
-    token = jwt.sign(payload, JWT_SECRET_KEY, { expiresIn: "23h" });
+    token = jwt.sign(payload, JWT_SECRET_KEY, {
+      expiresIn: jwtTokenExpirationTime,
+    });
   } catch (error) {
     error.message = `Error: An issue occurred while generating the authentication token: ${error.message}`;
     throw error;
@@ -95,7 +101,33 @@ async function loginUser(_, { email, password }) {
   };
 }
 
+/**
+ * Retrieves a user by ID.
+ *
+ * @param {number} id The ID of the user to retrieve.
+ * @returns {object|null} The user object if found, otherwise null.
+ * @throws {Error} Throws an error if there is an issue retrieving the user, with details
+ * about the failure.
+ */
+async function getUserById(id) {
+  let user;
+  try {
+    user = await User.findOne({
+      attributes: { exclude: ["updatedAt", "createdAt"] },
+      where: {
+        id,
+      },
+    });
+  } catch (error) {
+    error.message = `Failed to retrieve user with ID ${id}: ${error.message}`;
+    throw error;
+  }
+
+  return user || null;
+}
+
 export default {
   registerUser,
   loginUser,
+  getUserById,
 };

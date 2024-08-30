@@ -1,5 +1,6 @@
 import express from "express";
 
+import authenticate from "../middlewares/authenticate.js";
 import {
   createContactReqBodyValidationMiddleware,
   updateContactReqBodyValidationMiddleware,
@@ -17,6 +18,8 @@ import { replyValidationMiddleware } from "../middlewares/replyValidationMiddlew
 import contactsControllers from "../controllers/contactsControllers.js";
 
 const contactsRouter = express.Router();
+
+contactsRouter.use(authenticate);
 
 contactsRouter.get(
   "/",
