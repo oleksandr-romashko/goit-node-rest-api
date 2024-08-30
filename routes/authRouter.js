@@ -1,5 +1,6 @@
 import { Router } from "express";
 
+import authenticate from "../middlewares/authenticateMiddleware.js";
 import {
   authRegisterUserReqBodyValidationMiddleware,
   authLoginUserReqBodyValidationMiddleware,
@@ -27,5 +28,7 @@ authRouter.post(
   replyValidationMiddleware("User"),
   authControllers.loginUser
 );
+
+authRouter.get("/current", authenticate, authControllers.getCurrent);
 
 export default authRouter;

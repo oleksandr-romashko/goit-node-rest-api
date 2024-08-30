@@ -34,7 +34,28 @@ const loginUser = (req, res) => {
   res.json(user);
 };
 
+/**
+ * Controller to handle the request to get the current user's details.
+ * It retrieves the user's details from the request variable
+ * (populated by an authentication middleware) and sends them in the response.
+ *
+ * The response includes:
+ * - `email`: The email of the currently authenticated user.
+ * - `subscription`: The subscription type of the currently authenticated user.
+ *
+ * @param {Object} req Express request object.
+ * @param {Object} res Express response object.
+ */
+const getCurrent = (req, res) => {
+  const { email, subscription } = req.user;
+  res.json({
+    email,
+    subscription,
+  });
+};
+
 export default {
   registerUser,
   loginUser,
+  getCurrent,
 };
