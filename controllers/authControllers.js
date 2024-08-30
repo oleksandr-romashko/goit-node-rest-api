@@ -30,8 +30,8 @@ const registerUser = (req, res) => {
  * @param {Object} res Express response object.
  */
 const loginUser = (req, res) => {
-  const contact = req.serviceMiddlewareArtifact;
-  res.json(contact);
+  const user = req.serviceMiddlewareArtifact;
+  res.json(user);
 };
 
 export default {

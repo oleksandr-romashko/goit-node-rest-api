@@ -18,6 +18,7 @@ const { JWT_SECRET_KEY } = process.env;
  * about the failure.
  */
 async function registerUser(_, data) {
+  // Hash password in request
   let hashPassword;
   try {
     hashPassword = await bcrypt.hash(data.password, 10);
@@ -26,6 +27,7 @@ async function registerUser(_, data) {
     throw error;
   }
 
+  // Add user to database with hashed password
   let registeredUser;
   try {
     registeredUser = await User.create({ ...data, password: hashPassword });
@@ -47,6 +49,7 @@ async function registerUser(_, data) {
  * about the failure.
  */
 async function loginUser(_, { email, password }) {
+  // Find user in database based on email
   let user;
   try {
     user = await User.findOne({
@@ -57,6 +60,7 @@ async function loginUser(_, { email, password }) {
     error.message = `Error: while login user and finding existing user: ${error.message}`;
     throw error;
   }
+  // Throw error if user not found
   if (!user) {
     throw new HttpError(401, {
       message: "Email or password is wrong",
@@ -65,6 +69,7 @@ async function loginUser(_, { email, password }) {
     });
   }
 
+  // Compare request password with hashed in database
   let passwordCompare;
   try {
     passwordCompare = await bcrypt.compare(password, user.password);
@@ -72,6 +77,7 @@ async function loginUser(_, { email, password }) {
     error.message = `Error: while comparing passwords: ${error.message}`;
     throw error;
   }
+  // Throw error if passwords do not match
   if (!passwordCompare) {
     throw new HttpError(401, {
       message: "Email or password is wrong",
@@ -79,6 +85,7 @@ async function loginUser(_, { email, password }) {
     });
   }
 
+  // Create JWT token for user using secret key
   let token;
   try {
     const payload = {
@@ -92,6 +99,7 @@ async function loginUser(_, { email, password }) {
     throw error;
   }
 
+  // Return reply with token and user data
   return {
     token: token,
     user: {
