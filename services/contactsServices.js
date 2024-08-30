@@ -43,7 +43,7 @@ async function getContact(id, { owner }) {
       },
     });
   } catch (error) {
-    error.message = `Failed to retrieve contact with ID ${id}: ${error.message}`;
+    error.message = `Failed to retrieve contact with ID '${id}': ${error.message}`;
     throw error;
   }
 
@@ -72,7 +72,7 @@ async function removeContact(id, { owner }) {
     if (affectedRows === 0) {
       throw new HttpError(400, {
         message: "Nothing to remove or deletion was not effective",
-        details: `number of affected rows is ${affectedRows}, contact not found or already deleted`,
+        details: `number of affected rows is '${affectedRows}', contact not found or already deleted`,
       });
     }
     return contact;
@@ -130,7 +130,8 @@ async function updateContact(id, { owner, ...restData }) {
 
   if (!affectedRows && updatedContact) {
     throw new HttpError(400, {
-      message: "Nothing to update or update was not effective while updating contact",
+      message:
+        "Nothing to update or update was not effective while updating contact",
       details: `number of affected rows is ${affectedRows}`,
     });
   }

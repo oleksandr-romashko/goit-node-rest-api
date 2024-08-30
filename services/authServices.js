@@ -135,7 +135,7 @@ async function getUserById(id) {
       },
     });
   } catch (error) {
-    error.message = `Failed to retrieve user with ID ${id}: ${error.message}`;
+    error.message = `Failed to retrieve user with ID '${id}': ${error.message}`;
     throw error;
   }
 
