@@ -99,9 +99,17 @@ async function loginUser(_, { email, password }) {
     throw error;
   }
 
-  // Return reply with token and user data
+  // Update current user with token
+  try {
+    user = await updateUser(user.id, { token });
+  } catch (error) {
+    error.message = `Error while saving token to user: ${error.message}`;
+    throw error;
+  }
+
+  // Return reply object with token and user data
   return {
-    token: token,
+    token: user.token,
     user: {
       email: user.email,
       subscription: user.subscription,
@@ -134,8 +142,39 @@ async function getUserById(id) {
   return user || null;
 }
 
+/**
+ * Updates user.
+ *
+ * @param {number} id The ID of the user to update.
+ * @param {object} data The new data for the user.
+ * @returns {object|null} The updated user object if the update was successful, otherwise null.
+ * @throws {HttpError} Throws an error if the update fails, with details about the failure.
+ */
+async function updateUser(id, data) {
+  let affectedRows;
+  try {
+    [affectedRows] = await User.update(data, { where: { id } });
+  } catch (error) {
+    error.message = `Error: while updating user with ID '${id}': ${error.message}`;
+    throw error;
+  }
+  const updatedUser = await getUserById(id);
+  if (!affectedRows && updatedUser) {
+    throw new HttpError(400, {
+      message:
+        "Nothing to update or update was not effective while updating user",
+      details: `number of affected rows is ${affectedRows}`,
+    });
+  }
+  if (!updatedUser) {
+    return null;
+  }
+  return updatedUser;
+}
+
 export default {
   registerUser,
   loginUser,
   getUserById,
+  updateUser,
 };
