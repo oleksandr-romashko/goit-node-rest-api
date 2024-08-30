@@ -12,7 +12,8 @@ const { JWT_SECRET_KEY } = process.env;
  * 1. Checks if the authorization header contains a token.
  * 2. Ensures the token type is 'Bearer'.
  * 3. Verifies the token and extracts the user ID from the payload.
- * 4. Checks if the user associated with the token exists in the database.
+ * 4. Checks if the user associated with the token exists in the database
+ * 5. Assign user object to `req.user`.
  *
  * If any of these checks fail, an HTTP error with status 401 (Unauthorized)
  * is passed to the next middleware.
@@ -66,7 +67,7 @@ const authenticate = async (req, _, next) => {
     );
   }
 
-  // 4. Check if user is presented in database
+  // 4. Check if user is presented in database and assign it to `req.user`.
   const user = await authServices.getUserById(id);
   if (!user) {
     return next(
@@ -76,6 +77,9 @@ const authenticate = async (req, _, next) => {
       })
     );
   }
+
+  // 5. Assign user to `req.user` variable.
+  req.user = user;
 
   next();
 };

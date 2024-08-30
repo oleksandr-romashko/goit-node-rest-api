@@ -10,6 +10,13 @@ import validateSchemaValue from "../decorators/validateSchemaValue.js";
  */
 const fields = ["name", "email", "phone", "favorite"];
 
+/**
+ * An array of fields that are forbidden for update operations, handled with custom errors.
+ *
+ * @type {string[]}
+ */
+const forbiddenForUpdateFields = ["id", "favorite", "owner"];
+
 const validateEmail = validateSchemaValue(emailChecks, fields[1]);
 
 /**
@@ -84,6 +91,15 @@ export const contactUpdateSchema = Joi.object({
     }),
   [fields[2]]: Joi.string().messages({
     "string.empty": `'${fields[2]}' value cannot be empty`,
+  }),
+  [forbiddenForUpdateFields[0]]: Joi.forbidden().messages({
+    "any.unknown": `'${forbiddenForUpdateFields[0]}' field is not allowed in this request`,
+  }),
+  [forbiddenForUpdateFields[1]]: Joi.forbidden().messages({
+    "any.unknown": `'${forbiddenForUpdateFields[1]}' field is not allowed in this request - use other endpoint to change favorite status`,
+  }),
+  [forbiddenForUpdateFields[2]]: Joi.forbidden().messages({
+    "any.unknown": `'${forbiddenForUpdateFields[2]}' field is not allowed in this request - user is not allowed to change contact owner`,
   }),
 })
   .or(...fields)

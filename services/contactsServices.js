@@ -8,11 +8,14 @@ import HttpError from "../helpers/HttpError.js";
  * @throws {Error} Throws an error if the operation fails, with details about
  * the failure.
  */
-async function listContacts() {
+async function listContacts(_, { owner }) {
   let contacts;
   try {
     contacts = await Contact.findAll({
-      attributes: { exclude: ["updatedAt", "createdAt"] },
+      attributes: { exclude: ["owner", "updatedAt", "createdAt"] },
+      where: {
+        owner,
+      },
       order: [["id", "asc"]],
     });
   } catch (error) {
@@ -31,13 +34,14 @@ async function listContacts() {
  * @throws {Error} Throws an error if the operation fails, with details about
  * the failure.
  */
-async function getContactById(id) {
+async function getContact(id, { owner }) {
   let contact;
   try {
     contact = await Contact.findOne({
-      attributes: { exclude: ["updatedAt", "createdAt"] },
+      attributes: { exclude: ["owner", "updatedAt", "createdAt"] },
       where: {
         id,
+        owner,
       },
     });
   } catch (error) {
@@ -57,14 +61,16 @@ async function getContactById(id) {
  * @throws {HttpError} Throws an `HttpError` if the deletion was not effective
  * or if an error occurs during the operation.
  */
-async function removeContactById(id) {
-  const contact = await getContactById(id);
+async function removeContact(id, { owner }) {
+  const contact = await getContact(id, { owner });
   if (!contact) {
     return null;
   }
 
   try {
-    const affectedRows = await Contact.destroy({ where: { id } });
+    const affectedRows = await Contact.destroy({
+      where: { id, owner },
+    });
     if (affectedRows === 0) {
       throw new HttpError(400, {
         message: "Nothing to remove or deletion was not effective",
@@ -89,10 +95,10 @@ async function removeContactById(id) {
  * @throws {Error} Throws an error if the contact creation fails, with details
  * about the failure.
  */
-async function addContact(_, { name, email, phone }) {
+async function addContact(_, data) {
   let createdContact;
   try {
-    createdContact = await Contact.create({ name, email, phone });
+    createdContact = await Contact.create({ ...data });
   } catch (error) {
     error.message = `Error: while adding a new contact: ${error.message}`;
     throw error;
@@ -113,16 +119,16 @@ async function addContact(_, { name, email, phone }) {
  * @throws {HttpError} Throws an error if the update operation fails or is not
  * effective.
  */
-async function updateContact(id, data) {
+async function updateContact(id, { owner, ...restData }) {
   let affectedRows;
   try {
-    [affectedRows] = await Contact.update(data, { where: { id } });
+    [affectedRows] = await Contact.update(restData, { where: { id, owner } });
   } catch (error) {
     error.message = `Error: while updating contact: ${error.message}`;
     throw error;
   }
 
-  const updatedContact = await getContactById(id);
+  const updatedContact = await getContact(id, { owner });
 
   if (!affectedRows && updatedContact) {
     throw new HttpError(400, {
@@ -138,15 +144,15 @@ async function updateContact(id, data) {
   return updatedContact;
 }
 
-async function updateContactStatus(id, data) {
-  const updatedContact = await updateContact(id, data);
+async function updateContactStatus(id, { owner, ...restData }) {
+  const updatedContact = await updateContact(id, restData);
   return updatedContact;
 }
 
 export default {
   listContacts,
-  getContactById,
-  removeContactById,
+  getContact,
+  removeContact,
   addContact,
   updateContact,
   updateContactStatus,

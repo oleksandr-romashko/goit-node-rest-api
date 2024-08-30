@@ -6,11 +6,11 @@ export const getAllContactsServiceMiddleware = serviceWrapper(
 );
 
 export const getOneContactServiceMiddleware = serviceWrapper(
-  contactsServices.getContactById
+  contactsServices.getContact
 );
 
 export const removeContactServiceMiddleware = serviceWrapper(
-  contactsServices.removeContactById
+  contactsServices.removeContact
 );
 
 export const createContactServiceMiddleware = serviceWrapper(
