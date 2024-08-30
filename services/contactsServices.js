@@ -130,7 +130,7 @@ async function updateContact(id, { owner, ...restData }) {
 
   if (!affectedRows && updatedContact) {
     throw new HttpError(400, {
-      message: "Nothing to update or update was not effective",
+      message: "Nothing to update or update was not effective while updating contact",
       details: `number of affected rows is ${affectedRows}`,
     });
   }
