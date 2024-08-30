@@ -1,12 +1,21 @@
-// e-mail constraints
-export const emailRegEx = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+// e-mail constraints and checks
 export const emailMinLength = 6;
-
-// password constraints
-export const passwordMinLength = 8;
-export const passwordRegEx = new RegExp(
-  `^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d@$!%*?&]{${passwordMinLength},}$`
-);
-export const passwordRegExDescription = [
-  `should have a minimum length of ${passwordMinLength} characters, contain at least one letter (either uppercase or lowercase), at least one digit, and may include special characters like @, $, !, %, *, ?, and &`,
+export const emailRegEx = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+export const emailChecks = [
+  {
+    regex: /^[^\s@]+@/,
+    tip: "should contain characters before the '@' symbol",
+  },
+  {
+    regex: /@[^.\s@]+\./,
+    tip: "should contain a domain name after the '@' symbol and a '.'",
+  },
+  {
+    regex: /\.[a-zA-Z]{2,}$/,
+    tip: "should end with a valid top-level domain (TLD) after a '.'",
+  },
+  {
+    regex: new RegExp(`^.{${emailMinLength},}$`),
+    tip: `should have a minimum length of ${emailMinLength} characters`,
+  },
 ];

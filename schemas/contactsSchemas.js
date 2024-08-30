@@ -1,6 +1,7 @@
 import Joi from "joi";
 
-import { emailRegEx, emailMinLength } from "../constants/authConstants.js";
+import { emailRegEx, emailChecks } from "../constants/authConstants.js";
+import validateSchemaValue from "../decorators/validateSchemaValue.js";
 
 /**
  * An array of contact object fields.
@@ -9,14 +10,16 @@ import { emailRegEx, emailMinLength } from "../constants/authConstants.js";
  */
 const fields = ["name", "email", "phone", "favorite"];
 
+const validateEmail = validateSchemaValue(emailChecks, fields[1]);
+
 /**
  * Joi validation schema for creating a contact.
  * This schema validates that the required fields are present and correctly formatted.
  *
  * The schema checks for:
- * - A required string field (name)
- * - A required and valid email field (email)
- * - A required string field (phone)
+ * - A required string field (`name`).
+ * - A required and valid email field (`email`) using pattern matching and additional custom validation.
+ * - A required string field (`phone`).
  *
  * It provides custom error messages for missing or empty fields,
  * as well as for an invalid email format.
@@ -33,13 +36,12 @@ export const contactCreateSchema = Joi.object({
     }),
   [fields[1]]: Joi.string()
     .required()
+    .custom(validateEmail)
     .pattern(emailRegEx)
-    .min(emailMinLength)
     .messages({
       "any.required": `'${fields[1]}' value is required`,
       "string.empty": `'${fields[1]}' value cannot be empty`,
-      "string.pattern.base": `'${fields[1]}' value should be a valid e-mail address`,
-      "string.min": `'${fields[1]}' value should be at least ${emailMinLength} characters long`,
+      "string.pattern.base": `'${fields[1]}' should be valid email`,
     }),
   [fields[2]]: Joi.string()
     .required()
@@ -56,12 +58,12 @@ export const contactCreateSchema = Joi.object({
 /**
  * Joi validation schema for updating a contact.
  * This schema allows partial updates by validating that at least one of the
- * optional fields (name, email, or phone) is provided.
+ * optional fields (`name`, `email`, or `phone`) is provided.
  *
  * The schema checks for:
- * - An optional string field (name)
- * - An optional and valid email field (email)
- * - An optional string field (phone)
+ * - An optional string field (`name`).
+ * - An optional and valid email field (`email`) using pattern matching and additional custom validation.
+ * - An optional string field (`phone`).
  *
  * It provides custom error messages for empty fields, invalid email format,
  * and missing fields if none of the optional fields are provided.
@@ -74,12 +76,11 @@ export const contactUpdateSchema = Joi.object({
     "string.empty": `'${fields[0]}' value cannot be empty`,
   }),
   [fields[1]]: Joi.string()
+    .custom(validateEmail)
     .pattern(emailRegEx)
-    .min(emailMinLength)
     .messages({
       "string.empty": `'${fields[1]}' value cannot be empty`,
-      "string.pattern.base": `'${fields[1]}' value should be a valid e-mail address`,
-      "string.min": `'${fields[1]}' value should be at least ${emailMinLength} characters long`,
+      "string.pattern.base": `'${fields[1]}' should be valid email`,
     }),
   [fields[2]]: Joi.string().messages({
     "string.empty": `'${fields[2]}' value cannot be empty`,
