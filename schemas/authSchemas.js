@@ -39,8 +39,8 @@ const passwordChecks = [
     tip: `should contain at least one digit`,
   },
   {
-    regex: /^[A-Za-z\d@$_!%*?&]+$/,
-    tip: `may include special characters like @, $, _, !, %, *, ?, and &`,
+    regex: /^[A-Za-z\d@#%^$_!%*?)(&]+$/,
+    tip: `may include special characters like @, #, %, ^, $, _, !, %, *, ?, ), (, and &`,
   },
 ];
 
