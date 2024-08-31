@@ -16,8 +16,8 @@ import HttpError from "../helpers/HttpError.js";
  */
 async function listContacts(
   _,
-  { owner },
-  { page = 1, limit = paginationLimitDefault }
+  { owner } = {},
+  { page = 1, limit = paginationLimitDefault } = {}
 ) {
   const normalizedLimit = Number(limit);
   const offset = (Number(page) - 1) * normalizedLimit;
@@ -47,7 +47,7 @@ async function listContacts(
  * @throws {Error} Throws an error if the operation fails, with details about
  * the failure.
  */
-async function getContact(id, { owner }) {
+async function getContact(id, { owner } = {}) {
   let contact;
   try {
     contact = await Contact.findOne({
@@ -73,7 +73,7 @@ async function getContact(id, { owner }) {
  * @throws {HttpError} Throws an `HttpError` if the deletion was not effective
  * or if an error occurs during the operation.
  */
-async function removeContact(id, { owner }) {
+async function removeContact(id, { owner } = {}) {
   const contact = await getContact(id, { owner });
   if (!contact) {
     return null;
@@ -131,7 +131,7 @@ async function addContact(_, data) {
  * @throws {HttpError} Throws an error if the update operation fails or is not
  * effective.
  */
-async function updateContact(id, { owner, ...restData }) {
+async function updateContact(id, { owner, ...restData } = {}) {
   let affectedRows;
   try {
     [affectedRows] = await Contact.update(restData, { where: { id, owner } });
@@ -165,7 +165,7 @@ async function updateContact(id, { owner, ...restData }) {
  * @returns {object | null} The updated contact object, or `null` if the contact does not exist.
  * @throws {HttpError} Throws an `HttpError` if the update operation fails or is not effective.
  */
-async function updateContactStatus(id, { owner, ...restData }) {
+async function updateContactStatus(id, { owner, ...restData } = {}) {
   const updatedContact = await updateContact(id, restData);
   return updatedContact;
 }

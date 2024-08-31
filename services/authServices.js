@@ -48,7 +48,7 @@ async function registerUser(_, data) {
  * @throws {Error | HttpError} Throws an error if the login fails, with details
  * about the failure.
  */
-async function loginUser(_, { email, password }) {
+async function loginUser(_, { email, password } = {}) {
   // Find user in database based on email
   let user;
   try {
