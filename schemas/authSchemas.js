@@ -8,23 +8,24 @@ import {
 import validateSchemaValue from "../decorators/validateSchemaValue.js";
 
 /**
- * An array of authentication-related object fields.
- * Order matters so keep current values as is, as code below refers to array index.
- * To extend and add new fields, add them to the end of the array to refer to them by index.
+ * An object of authentication-related fields.
  *
- * @constant
+ * @constant {object} fields
  */
-const fields = ["email", "password"];
+const fields = Object.freeze({
+  email: "email",
+  password: "password",
+});
 
 /**
  * Function to validate email values against multiple checks.
  */
-const validateEmail = validateSchemaValue(emailChecks, fields[0]);
+const validateEmail = validateSchemaValue(emailChecks, fields.email);
 
 /**
  * Function to validate password values against multiple checks.
  */
-const validatePassword = validateSchemaValue(passwordChecks, fields[1]);
+const validatePassword = validateSchemaValue(passwordChecks, fields.password);
 
 /**
  * Joi validation schema for registering a user.
@@ -40,21 +41,21 @@ const validatePassword = validateSchemaValue(passwordChecks, fields[1]);
  * @type {Joi.ObjectSchema}
  */
 export const authRegisterUserSchema = Joi.object({
-  [fields[0]]: Joi.string()
+  [fields.email]: Joi.string()
     .required()
     .custom(validateEmail)
     .pattern(emailRegEx)
     .messages({
-      "any.required": `'${fields[0]}' value is required`,
-      "string.empty": `'${fields[0]}' value cannot be empty`,
-      "string.pattern.base": `'${fields[0]}' should be valid email`,
+      "any.required": `'${fields.email}' value is required`,
+      "string.empty": `'${fields.email}' value cannot be empty`,
+      "string.pattern.base": `'${fields.email}' should be valid email`,
     }),
-  [fields[1]]: Joi.string()
+  [fields.password]: Joi.string()
     .required()
     .custom(validatePassword)
     .messages({
-      "any.required": `'${fields[1]}' value is required`,
-      "string.empty": `'${fields[1]}' value cannot be empty`,
+      "any.required": `'${fields.password}' value is required`,
+      "string.empty": `'${fields.password}' value cannot be empty`,
     }),
 });
 
@@ -72,20 +73,20 @@ export const authRegisterUserSchema = Joi.object({
  * @type {Joi.ObjectSchema}
  */
 export const authLoginUserSchema = Joi.object({
-  [fields[0]]: Joi.string()
+  [fields.email]: Joi.string()
     .required()
     .custom(validateEmail)
     .pattern(emailRegEx)
     .messages({
-      "any.required": `'${fields[0]}' value is required`,
-      "string.empty": `'${fields[0]}' value cannot be empty`,
-      "string.pattern.base": `'${fields[0]}' should be valid email`,
+      "any.required": `'${fields.email}' value is required`,
+      "string.empty": `'${fields.email}' value cannot be empty`,
+      "string.pattern.base": `'${fields.email}' should be valid email`,
     }),
-  [fields[1]]: Joi.string()
+  [fields.password]: Joi.string()
     .required()
     .custom(validatePassword) // TODO remove if excessive
     .messages({
-      "any.required": `'${fields[1]}' value is required`,
-      "string.empty": `'${fields[1]}' value cannot be empty`,
+      "any.required": `'${fields.password}' value is required`,
+      "string.empty": `'${fields.password}' value cannot be empty`,
     }),
 });

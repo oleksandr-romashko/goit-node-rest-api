@@ -4,20 +4,31 @@ import { emailRegEx, emailChecks } from "../constants/authConstants.js";
 import validateSchemaValue from "../decorators/validateSchemaValue.js";
 
 /**
- * An array of contact object fields.
- * Order matters so keep current values as is, as code below refers to array index.
- * For extend and add new fields add them to the end of the array to refer to them by index.
- */
-const fields = ["name", "email", "phone", "favorite"];
-
-/**
- * An array of fields that are forbidden for update operations, handled with custom errors.
+ * An object of contact fields.
  *
- * @type {string[]}
+ * @constant {object} fields
  */
-const forbiddenForUpdateFields = ["id", "favorite", "owner"];
+const fields = Object.freeze({
+  name: "name",
+  email: "email",
+  phone: "phone",
+  favorite: "favorite",
+  owner: "owner",
+});
 
-const validateEmail = validateSchemaValue(emailChecks, fields[1]);
+// TODO store values in object instead of array
+/**
+ * An object of fields that are forbidden for contact update operation.
+ *
+ * @constant {object} forbiddenForUpdateFields
+ */
+const forbiddenForUpdateFields = Object.freeze({
+  id: "id",
+  [fields.favorite]: [fields.favorite],
+  [fields.owner]: [fields.owner],
+});
+
+const validateEmail = validateSchemaValue(emailChecks, fields.email);
 
 /**
  * Joi validation schema for creating a contact.
@@ -35,31 +46,31 @@ const validateEmail = validateSchemaValue(emailChecks, fields[1]);
  * and lists the valid fields in the error message.
  */
 export const contactCreateSchema = Joi.object({
-  [fields[0]]: Joi.string()
+  [fields.name]: Joi.string()
     .required()
     .messages({
-      "any.required": `'${fields[0]}' value is required`,
-      "string.empty": `'${fields[0]}' value cannot be empty`,
+      "any.required": `'${fields.name}' value is required`,
+      "string.empty": `'${fields.name}' value cannot be empty`,
     }),
-  [fields[1]]: Joi.string()
+  [fields.email]: Joi.string()
     .required()
     .custom(validateEmail)
     .pattern(emailRegEx)
     .messages({
-      "any.required": `'${fields[1]}' value is required`,
-      "string.empty": `'${fields[1]}' value cannot be empty`,
-      "string.pattern.base": `'${fields[1]}' should be valid email`,
+      "any.required": `'${fields.email}' value is required`,
+      "string.empty": `'${fields.email}' value cannot be empty`,
+      "string.pattern.base": `'${fields.email}' should be valid email`,
     }),
-  [fields[2]]: Joi.string()
+  [fields.phone]: Joi.string()
     .required()
     .messages({
-      "any.required": `'${fields[2]}' value is required`,
-      "string.empty": `'${fields[2]}' value cannot be empty`,
+      "any.required": `'${fields.phone}' value is required`,
+      "string.empty": `'${fields.phone}' value cannot be empty`,
     }),
 }).messages({
-  "object.unknown": `an unrecognized field {{#label}} was provided, valid fields are: '${fields.join(
-    "', '"
-  )}'`,
+  "object.unknown": `an unrecognized field {{#label}} was provided, valid fields are: '${Object.values(
+    fields
+  ).join("', '")}'`,
 });
 
 /**
@@ -79,36 +90,36 @@ export const contactCreateSchema = Joi.object({
  * in the error message if an unknown field is encountered.
  */
 export const contactUpdateSchema = Joi.object({
-  [fields[0]]: Joi.string().messages({
-    "string.empty": `'${fields[0]}' value cannot be empty`,
+  [fields.name]: Joi.string().messages({
+    "string.empty": `'${fields.name}' value cannot be empty`,
   }),
-  [fields[1]]: Joi.string()
+  [fields.email]: Joi.string()
     .custom(validateEmail)
     .pattern(emailRegEx)
     .messages({
-      "string.empty": `'${fields[1]}' value cannot be empty`,
-      "string.pattern.base": `'${fields[1]}' should be valid email`,
+      "string.empty": `'${fields.email}' value cannot be empty`,
+      "string.pattern.base": `'${fields.email}' should be valid email`,
     }),
-  [fields[2]]: Joi.string().messages({
-    "string.empty": `'${fields[2]}' value cannot be empty`,
+  [fields.phone]: Joi.string().messages({
+    "string.empty": `'${fields.phone}' value cannot be empty`,
   }),
-  [forbiddenForUpdateFields[0]]: Joi.forbidden().messages({
-    "any.unknown": `'${forbiddenForUpdateFields[0]}' field is not allowed in this request`,
+  [forbiddenForUpdateFields.id]: Joi.forbidden().messages({
+    "any.unknown": `'${forbiddenForUpdateFields.id}' field is not allowed in this request`,
   }),
-  [forbiddenForUpdateFields[1]]: Joi.forbidden().messages({
-    "any.unknown": `'${forbiddenForUpdateFields[1]}' field is not allowed in this request - use other endpoint to change favorite status`,
+  [forbiddenForUpdateFields.favorite]: Joi.forbidden().messages({
+    "any.unknown": `'${forbiddenForUpdateFields.favorite}' field is not allowed in this request - use other endpoint to change favorite status`,
   }),
-  [forbiddenForUpdateFields[2]]: Joi.forbidden().messages({
-    "any.unknown": `'${forbiddenForUpdateFields[2]}' field is not allowed in this request - user is not allowed to change contact owner`,
+  [forbiddenForUpdateFields.owner]: Joi.forbidden().messages({
+    "any.unknown": `'${forbiddenForUpdateFields.owner}' field is not allowed in this request - user is not allowed to change contact owner`,
   }),
 })
-  .or(...fields)
+  .or(...Object.values(fields))
   .strict()
   .messages({
     "object.unknown": "an unrecognized field {{#label}} was provided",
-    "object.missing": `body must have at least one field, valid fields are: '${fields.join(
-      "', '"
-    )}'`,
+    "object.missing": `body must have at least one field, valid fields are: '${Object.values(
+      fields
+    ).join("', '")}'`,
   });
 
 /**
@@ -116,13 +127,9 @@ export const contactUpdateSchema = Joi.object({
  * The schema ensures that only the "favorite" field is accepted in the request body.
  */
 export const contactUpdateContactStatusSchema = Joi.object({
-  [fields[3]]: Joi.bool()
+  [fields.favorite]: Joi.bool()
     .required()
     .messages({
-      "any.required": `'${fields[3]}' value is required`,
+      "any.required": `'${fields.favorite}' value is required`,
     }),
-}).messages({
-  "object.unknown": `an unrecognized field {{#label}} was provided, valid fields are: '${fields.join(
-    "', '"
-  )}'`,
 });
