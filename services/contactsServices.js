@@ -172,8 +172,8 @@ async function updateContact(id, { owner, ...restData } = {}) {
  * @returns {object|null} The updated contact object, or `null` if the contact does not exist.
  * @throws {HttpError} Throws an `HttpError` if the update operation fails or is not effective.
  */
-async function updateContactStatus(id, { owner, ...restData } = {}) {
-  const updatedContact = await updateContact(id, restData);
+async function updateContactStatus(id, data) {
+  const updatedContact = await updateContact(id, data);
   return updatedContact;
 }
 
