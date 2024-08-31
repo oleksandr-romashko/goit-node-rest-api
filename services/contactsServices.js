@@ -5,12 +5,11 @@ import HttpError from "../helpers/HttpError.js";
 /**
  * Retrieves a paginated list of contacts for a specific owner.
  *
- * @param {number} _ Unused parameter.
- * @param {object} data Object containing the `owner` ID.
+ * @param {object} data Object containing the owner ID.
  * @param {number} data.owner The ID of the owner to filter contacts.
  * @param {object} queryParams Query parameters for pagination.
  * @param {number} [queryParams.page=1] The page number for pagination (default is 1).
- * @param {number} [queryParams.limit=paginationLimitDefault] The number of contacts per page (default is `paginationLimitDefault`).
+ * @param {number} [queryParams.limit=paginationLimitDefault] The number of contacts per page (default is paginationLimitDefault).
  * @returns {object[]} A list of contacts for the specified owner, with pagination applied.
  * @throws {Error} Throws an error if the operation fails, with details about the failure.
  */
@@ -43,9 +42,10 @@ async function listContacts(
  * Retrieves a single contact from the contacts list by its identifier.
  *
  * @param {number} id Contact identifier.
- * @returns {object | null} Contact object if contact was found or null if not.
- * @throws {Error} Throws an error if the operation fails, with details about
- * the failure.
+ * @param {object} data Object containing the owner ID.
+ * @param {number} data.owner The ID of the owner to filter contacts.
+ * @returns {object|null} Contact object if contact was found or null if not.
+ * @throws {Error} Throws an error if the operation fails, with details about the failure.
  */
 async function getContact(id, { owner } = {}) {
   let contact;
@@ -68,10 +68,10 @@ async function getContact(id, { owner } = {}) {
  * Removes a contact from the contacts list by its identifier.
  *
  * @param {number} id The identifier of the contact to be removed.
- * @returns {object | null} Removed contact object if the contact was found and
- * deleted, or `null` if the contact was not found.
- * @throws {HttpError} Throws an `HttpError` if the deletion was not effective
- * or if an error occurs during the operation.
+ * @param {object} data Object containing the owner ID.
+ * @param {number} data.owner The ID of the owner to filter contacts.
+ * @returns {object|null} Removed contact object if the contact was found and deleted, or `null` if the contact was not found.
+ * @throws {HttpError} Throws an `HttpError` if the deletion was not effective or if an error occurs during the operation.
  */
 async function removeContact(id, { owner } = {}) {
   const contact = await getContact(id, { owner });
@@ -103,9 +103,8 @@ async function removeContact(id, { owner } = {}) {
  * @param {string} data.name The name of the contact.
  * @param {string} data.email The email address of the contact.
  * @param {string} data.phone The phone number of the contact.
- * @returns {object | null} The newly added contact object.
- * @throws {Error} Throws an error if the contact creation fails, with details
- * about the failure.
+ * @returns {object|null} The newly added contact object, or `null` if the contact was not found.
+ * @throws {Error} Throws an error if the contact creation fails, with details about the failure.
  */
 async function addContact(_, data) {
   let createdContact;
@@ -123,13 +122,12 @@ async function addContact(_, data) {
  *
  * @param {number} id Contact identifier.
  * @param {object} data Contact data to update.
+ * @param {number} data.owner The ID of the owner to filter contacts.
  * @param {string} [data.name] Contact's name.
- * @param {string} [data.email] Contact's e-mail address.
+ * @param {string} [data.email] Contact's email address.
  * @param {string} [data.phone] Contact's phone number.
- * @returns {object | null} The updated contact object, or null if the contact
- * does not exist.
- * @throws {HttpError} Throws an error if the update operation fails or is not
- * effective.
+ * @returns {object|null} The updated contact object, or null if the contact does not exist.
+ * @throws {HttpError} Throws an error if the update operation fails or is not effective.
  */
 async function updateContact(id, { owner, ...restData } = {}) {
   let affectedRows;
@@ -163,6 +161,15 @@ async function updateContact(id, { owner, ...restData } = {}) {
  * @param {number} id The identifier of the contact to be updated.
  * @param {object} data The contact data to update, excluding `owner`.
  * @returns {object | null} The updated contact object, or `null` if the contact does not exist.
+ * @throws {HttpError} Throws an `HttpError` if the update operation fails or is not effective.
+ */
+
+/**
+ * Updates the status of a contact.
+ *
+ * @param {number} id The identifier of the contact to be updated.
+ * @param {object} data The contact data to update, including `owner`.
+ * @returns {object|null} The updated contact object, or `null` if the contact does not exist.
  * @throws {HttpError} Throws an `HttpError` if the update operation fails or is not effective.
  */
 async function updateContactStatus(id, { owner, ...restData } = {}) {
