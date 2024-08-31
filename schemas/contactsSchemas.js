@@ -16,7 +16,6 @@ const fields = Object.freeze({
   owner: "owner",
 });
 
-// TODO store values in object instead of array
 /**
  * An object of fields that are forbidden for contact update operation.
  *
