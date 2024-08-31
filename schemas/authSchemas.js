@@ -1,6 +1,10 @@
 import Joi from "joi";
 
-import { emailRegEx, emailChecks } from "../constants/authConstants.js";
+import {
+  emailRegEx,
+  emailChecks,
+  passwordChecks,
+} from "../constants/authConstants.js";
 import validateSchemaValue from "../decorators/validateSchemaValue.js";
 
 /**
@@ -11,38 +15,6 @@ import validateSchemaValue from "../decorators/validateSchemaValue.js";
  * @constant
  */
 const fields = ["email", "password"];
-
-/**
- * Minimum length required for the password.
- *
- * @constant
- */
-const passwordMinLength = 8;
-
-/**
- * Array of checks for validating the password field.
- * Each check includes a regex pattern and a corresponding error message.
- *
- * @constant
- */
-const passwordChecks = [
-  {
-    regex: new RegExp(`^.{${passwordMinLength},}$`),
-    tip: `should have a minimum length of ${passwordMinLength} characters`,
-  },
-  {
-    regex: /[A-Za-z]/,
-    tip: `should contain at least one letter (either uppercase or lowercase)`,
-  },
-  {
-    regex: /\d/,
-    tip: `should contain at least one digit`,
-  },
-  {
-    regex: /^[A-Za-z\d@#%^$_!%*?)(&]+$/,
-    tip: `may include special characters like @, #, %, ^, $, _, !, %, *, ?, ), (, and &`,
-  },
-];
 
 /**
  * Function to validate email values against multiple checks.
@@ -111,6 +83,7 @@ export const authLoginUserSchema = Joi.object({
     }),
   [fields[1]]: Joi.string()
     .required()
+    .custom(validatePassword) // TODO remove if excessive
     .messages({
       "any.required": `'${fields[1]}' value is required`,
       "string.empty": `'${fields[1]}' value cannot be empty`,

@@ -1,7 +1,11 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Sequelize } from "sequelize";
 
 import sequelize from "../sequelize.js";
-import { emailMinLength, emailRegEx } from "../../constants/authConstants.js";
+import {
+  emailMinLength,
+  emailRegEx,
+  passwordMinLength,
+} from "../../constants/authConstants.js";
 
 /**
  * Sequelize model definition for the "user" table.
@@ -30,6 +34,7 @@ const User = sequelize.define(
       allowNull: false,
       validate: {
         notEmpty: true,
+        len: [passwordMinLength, 254],
       },
     },
     subscription: {
