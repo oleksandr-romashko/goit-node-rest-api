@@ -84,7 +84,7 @@ export const authLoginUserSchema = Joi.object({
     }),
   [fields.password]: Joi.string()
     .required()
-    .custom(validatePassword) // TODO remove if excessive
+    .custom(validatePassword)
     .messages({
       "any.required": `'${fields.password}' value is required`,
       "string.empty": `'${fields.password}' value cannot be empty`,
