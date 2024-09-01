@@ -26,12 +26,11 @@ const avatarsFolderAbsPath = path.resolve(
  * @param {Object} res Express response object.
  */
 const registerUser = (req, res) => {
-  const { email, subscription, avatarURL } = req.serviceMiddlewareArtifact;
+  const { email, subscription } = req.serviceMiddlewareArtifact;
   res.status(201).json({
     user: {
       email,
       subscription,
-      avatarURL,
     },
   });
 };
