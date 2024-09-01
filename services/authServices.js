@@ -7,9 +7,12 @@ import {
   defaultRelAvatarFolderPath,
   defaultAvatarFileName,
   jwtTokenExpirationTime,
-  defaultPublicFolderName,
+  avatarFallbackUrl,
 } from "../constants/authConstants.js";
+
 import User from "../db/models/User.js";
+import { getGravatarUrl } from "../helpers/generateGravatar.js";
+import validateImageUrl from "../helpers/checkImageUrl.js";
 import HttpError from "../helpers/HttpError.js";
 
 const { JWT_SECRET_KEY } = process.env;
@@ -24,6 +27,27 @@ const { JWT_SECRET_KEY } = process.env;
  * about the failure.
  */
 async function registerUser(_, data) {
+  let avatarURL;
+
+  try {
+    // Try Gravatar URL for valid image
+    const gravatarUrlToCheck = await getGravatarUrl(data.email);
+    if (await validateImageUrl(gravatarUrlToCheck)) {
+      avatarURL = gravatarUrlToCheck;
+    } else if (await validateImageUrl(avatarFallbackUrl)) {
+      // Try fallback URL
+      avatarURL = avatarFallbackUrl;
+    }
+  } catch {
+    console.error("Error occurred while checking avatar URLs", error);
+  }
+
+  if (!avatarURL) {
+    // Both main URL checks failed
+    // Fallback to a local avatar file and provide its relative path in public folder
+    avatarURL = path.join(...defaultRelAvatarFolderPath, defaultAvatarFileName);
+  }
+
   // Hash password in request
   let hashPassword;
   try {
@@ -33,19 +57,13 @@ async function registerUser(_, data) {
     throw error;
   }
 
-  // Obtain default avatar relative path
-  const avatarRelativePath = path.join(
-    ...defaultRelAvatarFolderPath,
-    defaultAvatarFileName
-  );
-
   // Add user to database with hashed password and avatar URL
   let registeredUser;
   try {
     registeredUser = await User.create({
       ...data,
       password: hashPassword,
-      avatarURL: avatarRelativePath,
+      avatarURL,
     });
   } catch (error) {
     error.message = `Error: while registering user and creating a new user: ${error.message}`;

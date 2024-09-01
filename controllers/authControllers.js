@@ -111,11 +111,7 @@ const updateAvatar = async (req, res) => {
   const oldAvatarAbsPath = path.resolve(req.user.dataValues.avatarURL);
 
   // Update user with new avatar relative path
-  const newRelPath = path.join(
-    defaultPublicFolderName,
-    ...defaultRelAvatarFolderPath,
-    filename
-  );
+  const newRelPath = path.join(...defaultRelAvatarFolderPath, filename);
   const { avatarURL } = await authServices.updateUser(req.user.id, {
     avatarURL: newRelPath,
   });

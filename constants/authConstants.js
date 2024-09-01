@@ -66,3 +66,6 @@ export const defaultRelAvatarFolderPath = ["avatars"];
 export const defaultAvatarFileName = "avatar_default_abstract.png";
 export const avatarMaxFileSizeKB = 1024;
 export const avatarAllowedExtensions = ["jpg", "jpeg", "png"];
+export const defaultGravatarAvatarSize = 512;
+export const avatarFallbackUrl =
+  "https://raw.githubusercontent.com/oleksandr-romashko/goit-node-rest-api/hw05-avatars/public/avatars/avatar_default_abstract.png";
