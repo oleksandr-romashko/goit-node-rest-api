@@ -33,7 +33,7 @@ const fileUploadValidationMiddleware = async (req, _, next) => {
   if (req.file.size === 0) {
     // Asynchronous method with full error handling
     try {
-      fs.unlink(req.file.path);
+      await fs.unlink(req.file.path);
     } catch (error) {
       if (error.code === "ENOENT") {
         // File does not exist

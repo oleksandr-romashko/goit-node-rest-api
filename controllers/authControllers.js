@@ -124,7 +124,7 @@ const updateAvatar = async (req, res) => {
   if (oldAvatarAbsPath !== defaultAbsAvatarPath) {
     // Asynchronous method with full error handling
     try {
-      fs.unlink(oldAvatarAbsPath);
+      await fs.unlink(oldAvatarAbsPath);
     } catch (error) {
       if (error.code === "ENOENT") {
         // File does not exist
