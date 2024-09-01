@@ -37,8 +37,6 @@ const validatePassword = validateSchemaValue(passwordChecks, fields.password);
  *
  * It provides custom error messages for missing or empty fields,
  * as well as for an invalid email format and password requirements.
- *
- * @type {Joi.ObjectSchema}
  */
 export const authRegisterUserSchema = Joi.object({
   [fields.email]: Joi.string()
@@ -69,8 +67,6 @@ export const authRegisterUserSchema = Joi.object({
  *
  * It provides custom error messages for missing or empty fields,
  * as well as for an invalid email format using pattern matching and additional custom validation.
- *
- * @type {Joi.ObjectSchema}
  */
 export const authLoginUserSchema = Joi.object({
   [fields.email]: Joi.string()

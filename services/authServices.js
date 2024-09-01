@@ -1,8 +1,14 @@
 import "dotenv/config";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import path from "node:path";
 
-import { jwtTokenExpirationTime } from "../constants/authConstants.js";
+import {
+  defaultRelAvatarFolderPath,
+  defaultAvatarFileName,
+  jwtTokenExpirationTime,
+  defaultPublicFolderName,
+} from "../constants/authConstants.js";
 import User from "../db/models/User.js";
 import HttpError from "../helpers/HttpError.js";
 
@@ -13,7 +19,7 @@ const { JWT_SECRET_KEY } = process.env;
  *
  * @param {object} data The data for the new user.
  * @param {string} data.password The plain text password of the user.
- * @returns {object} The newly registered user object.
+ * @returns {object} The newly registered user object with selected keys.
  * @throws {Error} Throws an error if the user registration fails, with details
  * about the failure.
  */
@@ -27,10 +33,20 @@ async function registerUser(_, data) {
     throw error;
   }
 
-  // Add user to database with hashed password
+  // Obtain default avatar relative path
+  const avatarRelativePath = path.join(
+    ...defaultRelAvatarFolderPath,
+    defaultAvatarFileName
+  );
+
+  // Add user to database with hashed password and avatar URL
   let registeredUser;
   try {
-    registeredUser = await User.create({ ...data, password: hashPassword });
+    registeredUser = await User.create({
+      ...data,
+      password: hashPassword,
+      avatarURL: avatarRelativePath,
+    });
   } catch (error) {
     error.message = `Error: while registering user and creating a new user: ${error.message}`;
     throw error;
@@ -113,6 +129,7 @@ async function loginUser(_, { email, password } = {}) {
     user: {
       email: user.email,
       subscription: user.subscription,
+      avatarURL: user.avatarURL,
     },
   };
 }

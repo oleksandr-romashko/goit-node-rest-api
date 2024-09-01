@@ -1,4 +1,4 @@
-// e-mail constraints and checks
+// E-mail constraints and checks
 export const emailMinLength = 6;
 export const emailRegEx = new RegExp(
   "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$"
@@ -22,7 +22,7 @@ export const emailChecks = [
   },
 ];
 
-// password constraints and checks
+// Password constraints and checks
 export const passwordMinLength = 8;
 export const passwordChecks = [
   {
@@ -56,3 +56,13 @@ export const passwordChecks = [
  * - "2M": 2 months (approximately 60 days)
  */
 export const jwtTokenExpirationTime = "23h";
+
+// "public" directory(ies) for serving static files
+// Serves files like images, CSS files, and JavaScript files
+export const defaultPublicFolderName = "public";
+
+// Avatar settings
+export const defaultRelAvatarFolderPath = ["avatars"];
+export const defaultAvatarFileName = "avatar_default_abstract.png";
+export const avatarMaxFileSizeKB = 1024;
+export const avatarAllowedExtensions = ["jpg", "jpeg", "png"];

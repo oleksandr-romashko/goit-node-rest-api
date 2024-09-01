@@ -4,9 +4,14 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 
+import {
+  defaultPublicFolderName,
+  avatarAllowedExtensions,
+} from "./constants/authConstants.js";
+
 import sequelize from "./db/sequelize.js";
-import contactsRouter from "./routes/contactsRouter.js";
 import authRouter from "./routes/authRouter.js";
+import contactsRouter from "./routes/contactsRouter.js";
 import HttpError from "./helpers/HttpError.js";
 
 /**
@@ -26,6 +31,7 @@ const app = express();
 
 /**
  * Middleware for logging HTTP requests using morgan.
+ * Logs requests in a predefined format for better monitoring.
  */
 app.use(morgan("tiny"));
 /**
@@ -38,6 +44,29 @@ app.use(cors());
  * Allows the app to process JSON payloads in incoming requests.
  */
 app.use(express.json());
+
+/**
+ * Middleware for serving static files from the "public" directory.
+ * Serves files like images, CSS files, and JavaScript files.
+ * @middleware
+ */
+
+/**
+ * Middleware for serving static files from the specified directory.
+ * This middleware serves static assets such as images, CSS files, and JavaScript files.
+ *
+ * @param {string} defaultPublicFolderName The name of the directory from which to serve static files.
+ * @param {Object} [options] Optional settings for serving static files.
+ * @param {string[]} [options.extensions] Sets file extension fallbacks:
+ * - If a file is not found, search for files with the specified extensions and serve the first one found.
+ *
+ * @middleware
+ */
+app.use(
+  express.static(defaultPublicFolderName, {
+    extensions: [...avatarAllowedExtensions],
+  })
+);
 
 /**
  * Route handler for all authentication-related routes.

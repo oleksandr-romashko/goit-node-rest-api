@@ -1,4 +1,18 @@
+import * as fs from "node:fs/promises";
+import path from "node:path";
+
+import {
+  defaultPublicFolderName,
+  defaultRelAvatarFolderPath,
+  defaultAvatarFileName,
+} from "../constants/authConstants.js";
+
 import authServices from "../services/authServices.js";
+
+const avatarsFolderAbsPath = path.resolve(
+  defaultPublicFolderName,
+  ...defaultRelAvatarFolderPath
+);
 
 /**
  * Controller to handle the request to register a new user.
@@ -12,11 +26,12 @@ import authServices from "../services/authServices.js";
  * @param {Object} res Express response object.
  */
 const registerUser = (req, res) => {
-  const { email, subscription } = req.serviceMiddlewareArtifact;
+  const { email, subscription, avatarURL } = req.serviceMiddlewareArtifact;
   res.status(201).json({
     user: {
       email,
       subscription,
+      avatarURL,
     },
   });
 };
@@ -62,10 +77,76 @@ const logoutUser = async (req, res) => {
  * @param {Object} res Express response object.
  */
 const getCurrent = (req, res) => {
-  const { email, subscription } = req.user;
+  const { email, subscription, avatarUrl } = req.user;
   res.json({
     email,
     subscription,
+    avatarUrl,
+  });
+};
+
+/**
+ * Controller to handle the request to update the user's avatar.
+ * This function moves the uploaded avatar file from a temporary folder to
+ * the final destination, updates the user's record with the new avatar path,
+ * and removes the old avatar file if it is not the default avatar.
+ *
+ * @param {Object} req Express request object.
+ * @param {Object} req.file Contains information about the uploaded file.
+ * @param {Object} req.user The authenticated user's data.
+ * @param {Object} res Express response object.
+ *
+ * @throws {Error} Throws an error if there is an issue moving the file or updating the user record.
+ */
+const updateAvatar = async (req, res) => {
+  // Move avatar file from `temp` folder to `avatars` folder
+  const { path: oldAbsTempPath, filename } = req.file;
+  const newAbsAvatarPath = path.join(avatarsFolderAbsPath, filename);
+  try {
+    await fs.rename(oldAbsTempPath, newAbsAvatarPath);
+  } catch (error) {
+    error.message = `Error: while moving user avatar file '${filename}' from '${oldAbsTempPath}' to '${avatarsFolderAbsPath}'`;
+  }
+
+  // Obtain old user avatar absolute path for future deletion
+  const oldAvatarAbsPath = path.resolve(req.user.dataValues.avatarURL);
+
+  // Update user with new avatar relative path
+  const newRelPath = path.join(
+    defaultPublicFolderName,
+    ...defaultRelAvatarFolderPath,
+    filename
+  );
+  const { avatarURL } = await authServices.updateUser(req.user.id, {
+    avatarURL: newRelPath,
+  });
+
+  // Clean-up - remove old user avatar file if not default avatar
+  const defaultAbsAvatarPath = path.resolve(
+    ...defaultRelAvatarFolderPath,
+    defaultAvatarFileName
+  );
+  if (oldAvatarAbsPath !== defaultAbsAvatarPath) {
+    // Asynchronous method with full error handling
+    try {
+      fs.unlink(oldAvatarAbsPath);
+    } catch (error) {
+      if (error.code === "ENOENT") {
+        // File does not exist
+        console.error("File not found");
+      } else if (error.code === "EACCES") {
+        // Permission denied
+        console.error("Permission denied");
+      } else {
+        // Other errors
+        console.error(`Error deleting file: ${error.message}`);
+      }
+    }
+  }
+
+  // Sent response with updated avatar URL data
+  res.json({
+    avatarURL,
   });
 };
 
@@ -74,4 +155,5 @@ export default {
   loginUser,
   logoutUser,
   getCurrent,
+  updateAvatar,
 };

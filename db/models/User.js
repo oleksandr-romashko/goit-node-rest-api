@@ -49,6 +49,9 @@ const User = sequelize.define(
         notEmpty: true,
       },
     },
+    avatarURL: {
+      type: DataTypes.STRING,
+    },
   },
   {
     hooks: {
