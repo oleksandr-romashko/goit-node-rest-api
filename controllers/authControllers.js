@@ -8,6 +8,9 @@ import {
 } from "../constants/authConstants.js";
 
 import authServices from "../services/authServices.js";
+import { emailConfirmationHtml } from "../constants/emailTemplates.js";
+import { sendEmail } from "../services/emailService.js";
+import HttpError from "../helpers/HttpError.js";
 
 const avatarsFolderAbsPath = path.resolve(
   defaultPublicFolderName,
@@ -55,6 +58,7 @@ const loginUser = (req, res) => {
  * This function sends a 204 No Content response, indicating
  * that the request was successful but there is no content to send in the response.
  *
+ * @param {Object} req Express request object.
  * @param {Object} res Express response object.
  */
 const logoutUser = async (req, res) => {
@@ -71,6 +75,7 @@ const logoutUser = async (req, res) => {
  * The response includes:
  * - `email`: The email of the currently authenticated user.
  * - `subscription`: The subscription type of the currently authenticated user.
+ * - `avatarUrl`: The avatar URL of the currently authenticated user.
  *
  * @param {Object} req Express request object.
  * @param {Object} res Express response object.
@@ -122,7 +127,9 @@ const updateAvatar = async (req, res) => {
     defaultAvatarFileName
   );
   if (oldAvatarAbsPath !== defaultAbsAvatarPath) {
-    // Asynchronous method with full error handling
+    // Attempt to delete the old avatar file.
+    // Full error handling is implemented to ensure that the process continues
+    // even if an error occurs during the file deletion.
     try {
       await fs.unlink(oldAvatarAbsPath);
     } catch (error) {
@@ -145,10 +152,100 @@ const updateAvatar = async (req, res) => {
   });
 };
 
+/**
+ * Controller to handle email verification requests.
+ * It verifies the user's email based on the verification token
+ * provided in the request parameters.
+ *
+ * @param {Object} req Express request object.
+ * @param {Object} res Express response object.
+ * @param {Function} next Express next middleware function.
+ *
+ * @throws {HttpError} Throws an error if the user is not found or the email has already been confirmed.
+ */
+const verify = async (req, res, next) => {
+  // Retrieve verification token from request
+  const { verificationToken } = req.params;
+
+  // Find user related with obtained verification token
+  const user = await authServices.getUser({ verificationToken });
+  if (!user) {
+    return next(
+      new HttpError(404, {
+        message: "User not found",
+        details: `User with the verification token '${verificationToken}' not found or the email has already been confirmed.`,
+      })
+    );
+  }
+
+  // Mark user email as verified
+  await authServices.updateUser(user.id, {
+    verify: true,
+    verificationToken: null,
+  });
+
+  // Reply with success message
+  res.json({
+    message: "Verification successful",
+  });
+};
+
+/**
+ * Controller to handle requests to resend the email verification.
+ * It resends a verification email to the user's email address.
+ *
+ * @param {Object} req Express request object.
+ * @param {Object} res Express response object.
+ * @param {Function} next Express next middleware function.
+ *
+ * @throws {HttpError} Throws an error if the user is not found or the email has already been verified.
+ */
+const resendVerify = async (req, res, next) => {
+  // Retrieve email from request
+  const { email } = req.body;
+
+  // Find user related with obtained email
+  const user = await authServices.getUser({ email });
+  if (!user) {
+    return next(
+      new HttpError(404, {
+        message: "User not found",
+        details: `User with the email '${email}' not found.`,
+      })
+    );
+  }
+
+  // Check whether the user's email has already been verified
+  if (user.verify === true) {
+    return next(
+      new HttpError(400, {
+        message: "Verification has already been passed",
+      })
+    );
+  }
+
+  // Resend a verification email to the user's email address for email verification
+  await sendEmail({
+    to: email,
+    subject: "Resent: Confirm Your Email Address",
+    html: emailConfirmationHtml(
+      `${process.env.BASE_URL}/api/auth/verify/${user.verificationToken}`,
+      true
+    ),
+  });
+
+  // Reply with success message
+  res.json({
+    message: "Verification email sent",
+  });
+};
+
 export default {
   registerUser,
   loginUser,
   logoutUser,
   getCurrent,
   updateAvatar,
+  verify,
+  resendVerify,
 };

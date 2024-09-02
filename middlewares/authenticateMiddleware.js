@@ -69,7 +69,7 @@ const authenticate = async (req, _, next) => {
   }
 
   // 4. Check if user is presented in database and assign it to `req.user`.
-  const user = await authServices.getUserById(id);
+  const user = await authServices.getUser({ id });
   if (!user) {
     return next(
       new HttpError(401, {

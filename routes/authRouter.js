@@ -4,6 +4,7 @@ import authenticate from "../middlewares/authenticateMiddleware.js";
 import {
   authRegisterUserReqBodyValidationMiddleware,
   authLoginUserReqBodyValidationMiddleware,
+  authEmailUserReqBodyValidationMiddleware,
 } from "../middlewares/authRequestValidationMiddleware.js";
 import {
   loginUserServiceMiddleware,
@@ -23,6 +24,14 @@ authRouter.post(
   authRegisterUserReqBodyValidationMiddleware,
   registerUserServiceMiddleware,
   authControllers.registerUser
+);
+
+authRouter.get("/verify/:verificationToken", authControllers.verify);
+
+authRouter.post(
+  "/verify",
+  authEmailUserReqBodyValidationMiddleware,
+  authControllers.resendVerify
 );
 
 authRouter.post(

@@ -86,3 +86,15 @@ export const authLoginUserSchema = Joi.object({
       "string.empty": `'${fields.password}' value cannot be empty`,
     }),
 });
+
+export const authEmailUserSchema = Joi.object({
+  [fields.email]: Joi.string()
+    .required()
+    .custom(validateEmail)
+    .pattern(emailRegEx)
+    .messages({
+      "any.required": `missing required field '${fields.email}'`,
+      "string.empty": `'${fields.email}' value cannot be empty`,
+      "string.pattern.base": `'${fields.email}' should be valid email`,
+    }),
+});
